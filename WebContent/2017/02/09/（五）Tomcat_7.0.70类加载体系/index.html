@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta name="baidu-site-verification" content="lKl7jYajUz" />
+    <meta charset="utf-8">
+    
+    <title>Tomcat源码学习（五）-- Tomcat_7.0.70 类加载体系分析 | 迷失的男孩</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="keywords" content="火龙战士,zhengweishan,郑伟山的博客，bolg,博客">
+    <meta name="description" content="1、前言Tomcat遵循J2EE规范，实现了Web容器。Java虚拟机有自己的一套类加载体系，同样Tomcat也有自己的一套类加载体系。
+2、概述首先简单介绍下Java虚拟机的主要的类加载器：
+
+
+启动类加载器（bootstrap classloader）
+ 它用来加载 Java 的核心库，是用原生代码(本地代码，与平台有关)来实现的，并不继承自java.lang.ClassLoader。这个类加">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tomcat源码学习（五）-- Tomcat_7.0.70 类加载体系分析">
+<meta property="og:url" content="http://zhengweishan.oschina.io/2017/02/09/（五）Tomcat_7.0.70类加载体系/index.html">
+<meta property="og:site_name" content="迷失的男孩">
+<meta property="og:description" content="1、前言Tomcat遵循J2EE规范，实现了Web容器。Java虚拟机有自己的一套类加载体系，同样Tomcat也有自己的一套类加载体系。
+2、概述首先简单介绍下Java虚拟机的主要的类加载器：
+
+
+启动类加载器（bootstrap classloader）
+ 它用来加载 Java 的核心库，是用原生代码(本地代码，与平台有关)来实现的，并不继承自java.lang.ClassLoader。这个类加">
+<meta property="og:image" content="http://i.imgur.com/FjDnfWq.png">
+<meta property="og:image" content="http://i.imgur.com/9MPidXk.png">
+<meta property="og:updated_time" content="2017-03-01T09:01:05.987Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tomcat源码学习（五）-- Tomcat_7.0.70 类加载体系分析">
+<meta name="twitter:description" content="1、前言Tomcat遵循J2EE规范，实现了Web容器。Java虚拟机有自己的一套类加载体系，同样Tomcat也有自己的一套类加载体系。
+2、概述首先简单介绍下Java虚拟机的主要的类加载器：
+
+
+启动类加载器（bootstrap classloader）
+ 它用来加载 Java 的核心库，是用原生代码(本地代码，与平台有关)来实现的，并不继承自java.lang.ClassLoader。这个类加">
+<meta name="twitter:image" content="http://i.imgur.com/FjDnfWq.png">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="迷失的男孩" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/favicon.ico" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="alternate stylesheet" href="http://cdn.bootcss.com/highlight.js/8.0/styles/monokai_sublime.min.css" title="highlight" />
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?eb23f1849f20e62c924d275e4edef134";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">迷失的男孩</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpg" />
+            <h2 id="name">迷失的男孩</h2>
+            <h3 id="title">为API生，为框架死，为debug奋斗一辈子，吃符号亏，上大小写的当，最后死在需求上。</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>中国, 北京</span>
+            <a id="follow" target="_blank" href="https://github.com/wesley5201314">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                25
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                13
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/wesley5201314" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://git.oschina.net/zhengweishan" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/css/images/weixin.png" target="_blank" title="weixin" class=tooltip>
+                            <i class="fa fa-weixin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="http://weibo.com/wesley5201314" target="_blank" title="weibo" class=tooltip>
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+        <div class="base-info" style="text-align:center">
+        <span style="color:#38b7ea">今天是：
+                 <script type="text/javascript">
+                　　today=new Date(); 
+                    var tdate,tday, x,year; 
+                    var x = new Array("星期日", "星期一", "星期二", "星期三", "星期四", "星期五","星期六");
+                　　var MSIE=navigator.userAgent.indexOf("MSIE");
+                    if(MSIE != -1)
+                    　year =(today.getFullYear());
+                    else
+                    　year = (today.getYear()+1900);
+                    　tdate= year+ "年" + (today.getMonth() + 1 ) + "月" + today.getDate() + "日" + " " + x[today.getDay()];
+                    　document.write(tdate); 
+                </script>
+        </span> 
+        </div>
+        <div class="base-info" style="text-align:center">
+                <span style="color:#38b7ea;"><script type="text/javascript">
+                    today=new Date();
+                    var day; var date; var hello;
+                    hour=new Date().getHours()
+                    if(hour < 6)hello='  凌晨好! '
+                    else if(hour < 9)hello=' 早上好! '
+                    else if(hour < 12)hello=' 上午好! '
+                    else if(hour < 14)hello=' 中午好! '
+                    else if(hour < 17)hello=' 下午好! '
+                    else if(hour < 19)hello=' 傍晚好! '
+                    else if(hour < 22)hello=' 晚上好! '
+                    else {hello='夜深了! '}
+                    var webUrl = webUrl;
+                    document.write(' '+hello);
+                </script>
+                </span>
+            <span id="busuanzi_container_site_uv">
+                您是本站第<span id="busuanzi_value_site_uv" class="foot-count"></span>位访客
+            </span>
+        </div>
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-（五）Tomcat_7.0.70类加载体系" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            Tomcat源码学习（五）-- Tomcat_7.0.70 类加载体系分析
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/02/09/（五）Tomcat_7.0.70类加载体系/">
+            <time datetime="2017-02-08T16:00:00.000Z" itemprop="datePublished">2017-02-09</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/tomcat/">tomcat</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h2 id="1、前言"><a href="#1、前言" class="headerlink" title="1、前言"></a>1、前言</h2><p>Tomcat遵循J2EE规范，实现了Web容器。Java虚拟机有自己的一套类加载体系，同样Tomcat也有自己的一套类加载体系。</p>
+<h2 id="2、概述"><a href="#2、概述" class="headerlink" title="2、概述"></a>2、概述</h2><p>首先简单介绍下Java虚拟机的主要的类加载器：</p>
+<p><img src="http://i.imgur.com/FjDnfWq.png" alt=""></p>
+<ol>
+<li><p>启动类加载器（bootstrap classloader）</p>
+<p> 它用来加载 Java 的核心库，是用原生代码(本地代码，与平台有关)来实现的，并不继承自java.lang.ClassLoader。这个类加载器负责将存放在<java_home>\lib目录中的，或者被-Xbootclasspath参数所指定的路径中的，并且是虚拟机识加的（仅按照文件名识别，如rt.jar，名字不符合的类库即使放在lib目录中也不会被加载）类库加载到虚拟机内存中。启动类加载器无法被Java程序直接引用。</java_home></p>
+</li>
+<li><p>扩展类加载器（extensions classloader）</p>
+<p> 扩展类加载器是由 Sun 的 ExtClassLoader（sun.misc.Launcher$ExtClassLoader） 实现的。它负责将 &lt; Java_Runtime_Home &gt;/lib/ext 或者由系统变量java.ext.dir 指定位置中的类库加载到内存中</p>
+</li>
+<li><p>应用程序类加载器（application classloader）</p>
+<p> 系统类加载器是由 Sun 的 AppClassLoader（sun.misc.Launcher$AppClassLoader）实现的，由于这个类加载器是ClassLoader中getSystemClassLoader()方法的返回值，所以一般也称它为系统类加载器。它根据 Java 应用的类路径（CLASSPATH）来加载 Java 类。开发者可以直接使用这个类加载器，如果应用程序中没有自定义过自己的类加载器，一般情况下这个就是程序默认的类加载器。</p>
+</li>
+<li><p>用户自定义的类装载器 </p>
+<p> 用户自定义的类装载器是普通的Java对象，它的类必须派生自java.lang.ClassLoader类。ClassLoader中定义的方法为程序为程序提供了访问类装载器机制的接口。此外，对于每一个被装载的类型，Java虚拟机都会为它创建一个java.lang.Class类的实例来代表该类型。和所有其它对象一样，用户自定义的类装载器以有Class类的实例都放在内存中的堆区，而装载的类型信息则都放在方法区。</p>
+</li>
+</ol>
+<a id="more"></a>
+<p>然后在来一张图简要说明Tomcat的类加载体系（图画的不好）：</p>
+<p><img src="http://i.imgur.com/9MPidXk.png" alt=""></p>
+<ul>
+<li>ClassLoader：Java提供的类加载器抽象类，用户自定义的类加载器需要继承实现</li>
+<li>commonLoader：Tomcat最基本的类加载器，加载路径中的class可以被Tomcat容器本身以及各个Webapp访问</li>
+<li>catalinaLoader：Tomcat容器私有的类加载器，加载路径中的class对于Webapp不可见</li>
+<li>sharedLoader：各个Webapp共享的类加载器，加载路径中的class对于所有Webapp可见，但是对于Tomcat容器不可见</li>
+<li><p>WebappClassLoader：各个Webapp私有的类加载器，加载路径中的class只对当前Webapp可见</p>
+<h2 id="3、分析"><a href="#3、分析" class="headerlink" title="3、分析"></a>3、分析</h2><p>commonLoader、catalinaLoader和sharedLoader在Tomcat容器初始化的一开始，即调用Bootstrap的init方法时创建。catalinaLoader会被设置为Tomcat主线程的线程上下文类加载器，并且使用catalinaLoader加载Tomcat容器自身容器下的class。Bootstrap的init方法的部分代码如下：</p>
+<p>  /**</p>
+<ul>
+<li><p>Initialize daemon.<br>*/<br>public void init()<br> throws Exception<br>{<br> setCatalinaHome();<br> setCatalinaBase();</p>
+<p> initClassLoaders();</p>
+<p> Thread.currentThread().setContextClassLoader(catalinaLoader);</p>
+<p> SecurityClassLoad.securityClassLoad(catalinaLoader);<br> …..<br>}</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>initClassLoaders方法：</p>
+<pre><code>private void initClassLoaders() {
+    try {
+        commonLoader = createClassLoader(&quot;common&quot;, null);
+        if( commonLoader == null ) {
+            // no config file, default to this loader - we might be in a &apos;single&apos; env.
+            commonLoader=this.getClass().getClassLoader();
+        }
+        catalinaLoader = createClassLoader(&quot;server&quot;, commonLoader);
+        sharedLoader = createClassLoader(&quot;shared&quot;, commonLoader);
+    } catch (Throwable t) {
+        handleThrowable(t);
+        log.error(&quot;Class loader creation threw exception&quot;, t);
+        System.exit(1);
+    }
+}
+</code></pre><p>创建类加载器的createClassLoader方法的实现：</p>
+<pre><code>private ClassLoader createClassLoader(String name, ClassLoader parent)
+    throws Exception {
+
+    String value = CatalinaProperties.getProperty(name + &quot;.loader&quot;);
+    if ((value == null) || (value.equals(&quot;&quot;)))
+        return parent;
+
+    value = replace(value);
+
+    List&lt;Repository&gt; repositories = new ArrayList&lt;Repository&gt;();
+
+    StringTokenizer tokenizer = new StringTokenizer(value, &quot;,&quot;);
+    while (tokenizer.hasMoreElements()) {
+        String repository = tokenizer.nextToken().trim();
+        if (repository.length() == 0) {
+            continue;
+        }
+
+        // Check for a JAR URL repository
+        try {
+            @SuppressWarnings(&quot;unused&quot;)
+            URL url = new URL(repository);
+            repositories.add(
+                    new Repository(repository, RepositoryType.URL));
+            continue;
+        } catch (MalformedURLException e) {
+            // Ignore
+        }
+
+        // Local repository
+        if (repository.endsWith(&quot;*.jar&quot;)) {
+            repository = repository.substring
+                (0, repository.length() - &quot;*.jar&quot;.length());
+            repositories.add(
+                    new Repository(repository, RepositoryType.GLOB));
+        } else if (repository.endsWith(&quot;.jar&quot;)) {
+            repositories.add(
+                    new Repository(repository, RepositoryType.JAR));
+        } else {
+            repositories.add(
+                    new Repository(repository, RepositoryType.DIR));
+        }
+    }
+
+    return ClassLoaderFactory.createClassLoader(repositories, parent);
+}
+</code></pre><p>createClassLoader最终使用ClassLoaderFactory.createClassLoader(locations, types, parent)方法创建ClassLoader。</p>
+<p>我们在看SecurityClassLoad.securityClassLoad(catalinaLoader);</p>
+<pre><code> public static void securityClassLoad(ClassLoader loader)
+    throws Exception {
+
+    if( System.getSecurityManager() == null ){
+        return;
+    }
+
+    loadCorePackage(loader);
+    loadCoyotePackage(loader);
+    loadLoaderPackage(loader);
+    loadRealmPackage(loader);
+    loadServletsPackage(loader);
+    loadSessionPackage(loader);
+    loadUtilPackage(loader);
+    loadValvesPackage(loader);
+    loadJavaxPackage(loader);
+    loadConnectorPackage(loader);
+    loadTomcatPackage(loader);
+}
+</code></pre><p>securityClassLoad方法主要加载Tomcat容器所需的class，包括：</p>
+<ul>
+<li>Tomcat核心class，即org.apache.catalina.core路径下的class；</li>
+<li>org.apache.catalina.loader.WebappClassLoader$PrivilegedFindResourceByName</li>
+<li>Tomcat有关session的class，即org.apache.catalina.session路径下的class</li>
+<li>Tomcat工具类的class，即org.apache.catalina.util路径下的class</li>
+<li>javax.servlet.http.Cookie</li>
+<li>Tomcat处理请求的class，即org.apache.catalina.connector路径下的class</li>
+<li>Tomcat其它工具类的class，也是org.apache.catalina.util路径下的class</li>
+</ul>
+<p>我们以加载Tomcat核心class的loadCorePackage方法为例，查看其实现：</p>
+<pre><code>private static final void loadCorePackage(ClassLoader loader)
+    throws Exception {
+    final String basePackage = &quot;org.apache.catalina.core.&quot;;
+    loader.loadClass
+        (basePackage +
+         &quot;AccessLogAdapter&quot;);
+    loader.loadClass
+        (basePackage +
+         &quot;ApplicationContextFacade$1&quot;);
+    loader.loadClass
+        (basePackage +
+         &quot;ApplicationDispatcher$PrivilegedForward&quot;);
+    loader.loadClass
+        (basePackage +
+         &quot;ApplicationDispatcher$PrivilegedInclude&quot;);
+    loader.loadClass
+        (basePackage +
+        &quot;AsyncContextImpl&quot;);
+    loader.loadClass
+        (basePackage +
+        &quot;AsyncContextImpl$DebugException&quot;);
+    loader.loadClass
+        (basePackage +
+        &quot;AsyncContextImpl$1&quot;);
+    loader.loadClass
+        (basePackage +
+        &quot;AsyncListenerWrapper&quot;);
+    loader.loadClass
+        (basePackage +
+         &quot;ContainerBase$PrivilegedAddChild&quot;);
+    loader.loadClass
+        (basePackage +
+         &quot;DefaultInstanceManager$1&quot;);
+    loader.loadClass
+        (basePackage +
+         &quot;DefaultInstanceManager$2&quot;);
+    loader.loadClass
+        (basePackage +
+         &quot;DefaultInstanceManager$3&quot;);
+    loader.loadClass
+        (basePackage +
+         &quot;DefaultInstanceManager$AnnotationCacheEntry&quot;);
+    loader.loadClass
+        (basePackage +
+         &quot;DefaultInstanceManager$AnnotationCacheEntryType&quot;);
+    loader.loadClass
+        (basePackage +
+         &quot;ApplicationHttpRequest$AttributeNamesEnumerator&quot;);
+}
+</code></pre><p>至此为止，我们还没有看到WebappClassLoader。启动StandardContext的时候会创建WebappLoader，StandardContext的方法startInternal的部分代码如下：</p>
+<pre><code>    protected synchronized void startInternal() throws LifecycleException {  
+
+    ......
+
+    if (getLoader() == null) {  
+        WebappLoader webappLoader = new WebappLoader(getParentClassLoader());  
+        webappLoader.setDelegate(getDelegate());  
+        setLoader(webappLoader);  
+    }  
+   ......  
+   if ((loader != null) &amp;&amp; (loader instanceof Lifecycle))  
+        ((Lifecycle) loader).start();   
+   // 省略后边的代码   
+}
+</code></pre><p>从上面代码看到最后会调用WebappLoader的start方法:</p>
+<pre><code>public final synchronized void start() throws LifecycleException {
+
+    if (LifecycleState.STARTING_PREP.equals(state) || LifecycleState.STARTING.equals(state) ||
+            LifecycleState.STARTED.equals(state)) {
+
+        if (log.isDebugEnabled()) {
+            Exception e = new LifecycleException();
+            log.debug(sm.getString(&quot;lifecycleBase.alreadyStarted&quot;, toString()), e);
+        } else if (log.isInfoEnabled()) {
+            log.info(sm.getString(&quot;lifecycleBase.alreadyStarted&quot;, toString()));
+        }
+
+        return;
+    }
+
+    if (state.equals(LifecycleState.NEW)) {
+        init();
+    } else if (state.equals(LifecycleState.FAILED)) {
+        stop();
+    } else if (!state.equals(LifecycleState.INITIALIZED) &amp;&amp;
+            !state.equals(LifecycleState.STOPPED)) {
+        invalidTransition(Lifecycle.BEFORE_START_EVENT);
+    }
+
+    setStateInternal(LifecycleState.STARTING_PREP, null, false);
+
+    try {
+        startInternal();//start再次调用了startInternal方法（WebappLoader中的方法）
+    } catch (Throwable t) {
+        // This is an &apos;uncontrolled&apos; failure so put the component into the
+        // FAILED state and throw an exception.
+        ExceptionUtils.handleThrowable(t);
+        setStateInternal(LifecycleState.FAILED, null, false);
+        throw new LifecycleException(sm.getString(&quot;lifecycleBase.startFail&quot;, toString()), t);
+    }
+
+    if (state.equals(LifecycleState.FAILED)) {
+        // This is a &apos;controlled&apos; failure. The component put itself into the
+        // FAILED state so call stop() to complete the clean-up.
+        stop();
+    } else if (!state.equals(LifecycleState.STARTING)) {
+        // Shouldn&apos;t be necessary but acts as a check that sub-classes are
+        // doing what they are supposed to.
+        invalidTransition(Lifecycle.AFTER_START_EVENT);
+    } else {
+        setStateInternal(LifecycleState.STARTED, null, false);
+    }
+}
+</code></pre><p>start又调用了startInternal方法，startInternal的实现如下：</p>
+<pre><code>protected void startInternal() throws LifecycleException {
+
+    if (log.isDebugEnabled())
+        log.debug(sm.getString(&quot;webappLoader.starting&quot;));
+
+    if (container.getResources() == null) {
+        log.info(&quot;No resources for &quot; + container);
+        setState(LifecycleState.STARTING);
+        return;
+    }
+
+    // Register a stream handler factory for the JNDI protocol
+    URLStreamHandlerFactory streamHandlerFactory =
+            DirContextURLStreamHandlerFactory.getInstance();
+    if (first) {
+        first = false;
+        try {
+            URL.setURLStreamHandlerFactory(streamHandlerFactory);
+        } catch (Exception e) {
+            // Log and continue anyway, this is not critical
+            log.error(&quot;Error registering jndi stream handler&quot;, e);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            // This is likely a dual registration
+            log.info(&quot;Dual registration of jndi stream handler: &quot;
+                     + t.getMessage());
+        }
+    }
+
+    // Construct a class loader based on our current repositories list
+    try {
+
+        classLoader = createClassLoader();
+        classLoader.setResources(container.getResources());
+        classLoader.setDelegate(this.delegate);
+        classLoader.setSearchExternalFirst(searchExternalFirst);
+        if (container instanceof StandardContext) {
+            classLoader.setAntiJARLocking(
+                    ((StandardContext) container).getAntiJARLocking());
+            classLoader.setClearReferencesRmiTargets(
+                    ((StandardContext) container).getClearReferencesRmiTargets());
+            classLoader.setClearReferencesStatic(
+                    ((StandardContext) container).getClearReferencesStatic());
+            classLoader.setClearReferencesStopThreads(
+                    ((StandardContext) container).getClearReferencesStopThreads());
+            classLoader.setClearReferencesStopTimerThreads(
+                    ((StandardContext) container).getClearReferencesStopTimerThreads());
+            classLoader.setClearReferencesHttpClientKeepAliveThread(
+                    ((StandardContext) container).getClearReferencesHttpClientKeepAliveThread());
+        }
+
+        for (int i = 0; i &lt; repositories.length; i++) {
+            classLoader.addRepository(repositories[i]);
+        }
+
+        // Configure our repositories
+        setRepositories();
+        setClassPath();
+
+        setPermissions();
+
+        ((Lifecycle) classLoader).start();
+
+        // Binding the Webapp class loader to the directory context
+        DirContextURLStreamHandler.bind(classLoader,
+                this.container.getResources());
+
+        StandardContext ctx=(StandardContext)container;
+        String contextName = ctx.getName();
+        if (!contextName.startsWith(&quot;/&quot;)) {
+            contextName = &quot;/&quot; + contextName;
+        }
+        ObjectName cloname = new ObjectName
+            (MBeanUtils.getDomain(ctx) + &quot;:type=WebappClassLoader,context=&quot;
+             + contextName + &quot;,host=&quot; + ctx.getParent().getName());
+        Registry.getRegistry(null, null)
+            .registerComponent(classLoader, cloname, null);
+
+    } catch (Throwable t) {
+        t = ExceptionUtils.unwrapInvocationTargetException(t);
+        ExceptionUtils.handleThrowable(t);
+        log.error( &quot;LifecycleException &quot;, t );
+        throw new LifecycleException(&quot;start: &quot;, t);
+    }
+
+    setState(LifecycleState.STARTING);
+}
+</code></pre><p>最后我们看看createClassLoader的实现：</p>
+<pre><code>    private WebappClassLoaderBase createClassLoader()
+    throws Exception {
+
+    Class&lt;?&gt; clazz = Class.forName(loaderClass);
+    WebappClassLoaderBase classLoader = null;
+
+    if (parentClassLoader == null) {
+        parentClassLoader = container.getParentClassLoader();
+    }
+    Class&lt;?&gt;[] argTypes = { ClassLoader.class };
+    Object[] args = { parentClassLoader };
+    Constructor&lt;?&gt; constr = clazz.getConstructor(argTypes);
+    classLoader = (WebappClassLoaderBase) constr.newInstance(args);
+
+    return classLoader;
+
+}
+</code></pre><p>至此Tomcat类加载完毕。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://zhengweishan.oschina.io/2017/02/09/（五）Tomcat_7.0.70类加载体系/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://zhengweishan.oschina.io/2017/02/09/（五）Tomcat_7.0.70类加载体系/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/02/10/（六）Tomcat_7.0.70生命周期管理/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    Tomcat源码学习（六）--Tomcat_7.0.70 生命周期管理
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/02/08/（四）Tomcat_7.0.70 server.xml文件的加载与解析/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">Tommcat源码学习（四）--Tomcat_7.0.70 server.xml文件的加载与解析</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2017/02/09/（五）Tomcat_7.0.70类加载体系/" data-title="Tomcat源码学习（五）-- Tomcat_7.0.70 类加载体系分析" data-url="http://zhengweishan.oschina.io/2017/02/09/（五）Tomcat_7.0.70类加载体系/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/27/CountDownLatch/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/并发/">并发</a></p>
+                            <p class="item-title"><a href="/2017/03/27/CountDownLatch/" class="title">java并发包里的CountDownLatch的用法</a></p>
+                            <p class="item-date"><time datetime="2017-03-26T16:00:00.000Z" itemprop="datePublished">2017-03-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/24/spring-boot-demo/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/SpringBoot/">SpringBoot</a></p>
+                            <p class="item-title"><a href="/2017/03/24/spring-boot-demo/" class="title">spring boot + mybatis + quartz + druid + swagger2</a></p>
+                            <p class="item-date"><time datetime="2017-03-23T16:00:00.000Z" itemprop="datePublished">2017-03-24</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/23/boy-rpc-framework/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/rpc/">rpc</a></p>
+                            <p class="item-title"><a href="/2017/03/23/boy-rpc-framework/" class="title">分布式rpc框架</a></p>
+                            <p class="item-date"><time datetime="2017-03-22T16:00:00.000Z" itemprop="datePublished">2017-03-23</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/02/10/（六）Tomcat_7.0.70生命周期管理/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a></p>
+                            <p class="item-title"><a href="/2017/02/10/（六）Tomcat_7.0.70生命周期管理/" class="title">Tomcat源码学习（六）--Tomcat_7.0.70 生命周期管理</a></p>
+                            <p class="item-date"><time datetime="2017-02-09T16:00:00.000Z" itemprop="datePublished">2017-02-10</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/02/09/（五）Tomcat_7.0.70类加载体系/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a></p>
+                            <p class="item-title"><a href="/2017/02/09/（五）Tomcat_7.0.70类加载体系/" class="title">Tomcat源码学习（五）-- Tomcat_7.0.70 类加载体系分析</a></p>
+                            <p class="item-date"><time datetime="2017-02-08T16:00:00.000Z" itemprop="datePublished">2017-02-09</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Elasticsearch/">Elasticsearch</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JMS/">JMS</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JVM/">JVM</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringBoot/">SpringBoot</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tomcat源码/">Tomcat源码</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/kafka/">kafka</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/rpc/">rpc</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/并发/">并发</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/ActiveMQ/" style="font-size: 16.67px;">ActiveMQ</a> <a href="/tags/Elasticsearch学习/" style="font-size: 13.33px;">Elasticsearch学习</a> <a href="/tags/GC/" style="font-size: 13.33px;">GC</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/JAVA/" style="font-size: 16.67px;">JAVA</a> <a href="/tags/JMS/" style="font-size: 16.67px;">JMS</a> <a href="/tags/JVM/" style="font-size: 13.33px;">JVM</a> <a href="/tags/Reflection/" style="font-size: 10px;">Reflection</a> <a href="/tags/SpingBoot/" style="font-size: 10px;">SpingBoot</a> <a href="/tags/kafka/" style="font-size: 16.67px;">kafka</a> <a href="/tags/rpc-分布式/" style="font-size: 10px;">rpc 分布式</a> <a href="/tags/tomcat/" style="font-size: 20px;">tomcat</a> <a href="/tags/并发，CountDownLatch/" style="font-size: 10px;">并发，CountDownLatch</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2017 郑伟山 版权所有<br> 
+            由 <a href="http://hexo.io/" target="_blank">Hexo</a> 强力驱动 &brvbar; 主题 -- <a href="https://github.com/ppoffice/hexo-theme-icarus">Icarus</a><br>
+            
+        </div>
+		<div class="inner">
+        	<span id="busuanzi_container_site_pv">
+    			本站总访问量<span id="busuanzi_value_site_pv" class="foot-count"></span>次
+			</span>
+		</div>
+    </div>
+<script src="http://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+</footer>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'wesley-icarus'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

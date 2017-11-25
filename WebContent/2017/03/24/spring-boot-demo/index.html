@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta name="baidu-site-verification" content="lKl7jYajUz" />
+    <meta charset="utf-8">
+    
+    <title>spring boot + mybatis + quartz + druid + swagger2 | 迷失的男孩</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="keywords" content="火龙战士,zhengweishan,郑伟山的博客，bolg,博客">
+    <meta name="description" content="spring boot + mybatis + quartz + druid + Swagger2 演示demo
+说明：主要演示如何整合，简单的任务调用。
+环境准备：
+
+jdk:1.7
+maven:3.2.3
+开发工具：IDEA
+
+源码地址：
+gitosc: https://git.oschina.net/zhengweishan/spring-boot_demo
+github: https://">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring boot + mybatis + quartz + druid + swagger2">
+<meta property="og:url" content="http://zhengweishan.oschina.io/2017/03/24/spring-boot-demo/index.html">
+<meta property="og:site_name" content="迷失的男孩">
+<meta property="og:description" content="spring boot + mybatis + quartz + druid + Swagger2 演示demo
+说明：主要演示如何整合，简单的任务调用。
+环境准备：
+
+jdk:1.7
+maven:3.2.3
+开发工具：IDEA
+
+源码地址：
+gitosc: https://git.oschina.net/zhengweishan/spring-boot_demo
+github: https://">
+<meta property="og:image" content="http://i.imgur.com/LNzimT3.png">
+<meta property="og:image" content="http://i.imgur.com/qD8hyb4.png">
+<meta property="og:image" content="http://i.imgur.com/Eb4k89i.png">
+<meta property="og:image" content="http://i.imgur.com/MkwOuR0.png">
+<meta property="og:image" content="http://i.imgur.com/8U2WVwG.png">
+<meta property="og:updated_time" content="2017-03-27T10:28:17.417Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spring boot + mybatis + quartz + druid + swagger2">
+<meta name="twitter:description" content="spring boot + mybatis + quartz + druid + Swagger2 演示demo
+说明：主要演示如何整合，简单的任务调用。
+环境准备：
+
+jdk:1.7
+maven:3.2.3
+开发工具：IDEA
+
+源码地址：
+gitosc: https://git.oschina.net/zhengweishan/spring-boot_demo
+github: https://">
+<meta name="twitter:image" content="http://i.imgur.com/LNzimT3.png">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="迷失的男孩" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/favicon.ico" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="alternate stylesheet" href="http://cdn.bootcss.com/highlight.js/8.0/styles/monokai_sublime.min.css" title="highlight" />
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?eb23f1849f20e62c924d275e4edef134";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">迷失的男孩</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpg" />
+            <h2 id="name">迷失的男孩</h2>
+            <h3 id="title">为API生，为框架死，为debug奋斗一辈子，吃符号亏，上大小写的当，最后死在需求上。</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>中国, 北京</span>
+            <a id="follow" target="_blank" href="https://github.com/wesley5201314">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                25
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                13
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/wesley5201314" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://git.oschina.net/zhengweishan" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/css/images/weixin.png" target="_blank" title="weixin" class=tooltip>
+                            <i class="fa fa-weixin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="http://weibo.com/wesley5201314" target="_blank" title="weibo" class=tooltip>
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+        <div class="base-info" style="text-align:center">
+        <span style="color:#38b7ea">今天是：
+                 <script type="text/javascript">
+                　　today=new Date(); 
+                    var tdate,tday, x,year; 
+                    var x = new Array("星期日", "星期一", "星期二", "星期三", "星期四", "星期五","星期六");
+                　　var MSIE=navigator.userAgent.indexOf("MSIE");
+                    if(MSIE != -1)
+                    　year =(today.getFullYear());
+                    else
+                    　year = (today.getYear()+1900);
+                    　tdate= year+ "年" + (today.getMonth() + 1 ) + "月" + today.getDate() + "日" + " " + x[today.getDay()];
+                    　document.write(tdate); 
+                </script>
+        </span> 
+        </div>
+        <div class="base-info" style="text-align:center">
+                <span style="color:#38b7ea;"><script type="text/javascript">
+                    today=new Date();
+                    var day; var date; var hello;
+                    hour=new Date().getHours()
+                    if(hour < 6)hello='  凌晨好! '
+                    else if(hour < 9)hello=' 早上好! '
+                    else if(hour < 12)hello=' 上午好! '
+                    else if(hour < 14)hello=' 中午好! '
+                    else if(hour < 17)hello=' 下午好! '
+                    else if(hour < 19)hello=' 傍晚好! '
+                    else if(hour < 22)hello=' 晚上好! '
+                    else {hello='夜深了! '}
+                    var webUrl = webUrl;
+                    document.write(' '+hello);
+                </script>
+                </span>
+            <span id="busuanzi_container_site_uv">
+                您是本站第<span id="busuanzi_value_site_uv" class="foot-count"></span>位访客
+            </span>
+        </div>
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-spring-boot-demo" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            spring boot + mybatis + quartz + druid + swagger2
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/03/24/spring-boot-demo/">
+            <time datetime="2017-03-23T16:00:00.000Z" itemprop="datePublished">2017-03-24</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/SpringBoot/">SpringBoot</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/SpingBoot/">SpingBoot</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>spring boot + mybatis + quartz + druid + Swagger2 演示demo</p>
+<p>说明：主要演示如何整合，简单的任务调用。</p>
+<p>环境准备：</p>
+<ul>
+<li>jdk:1.7</li>
+<li>maven:3.2.3</li>
+<li>开发工具：IDEA</li>
+</ul>
+<p>源码地址：</p>
+<p>gitosc: <a href="https://git.oschina.net/zhengweishan/spring-boot_demo" target="_blank" rel="external">https://git.oschina.net/zhengweishan/spring-boot_demo</a></p>
+<p>github: <a href="https://github.com/wesley5201314/spring-boot-demo" target="_blank" rel="external">https://github.com/wesley5201314/spring-boot-demo</a></p>
+<p>项目结构：</p>
+<p><img src="http://i.imgur.com/LNzimT3.png" alt=""></p>
+<a id="more"></a>
+<p><strong>备注：</strong><br>每个包的作用大家一看就明白了，这里主要说明下application.properties：这里主要配置针对于不同的环境用那个配置文件，这里我只提供了开发，测试的环境属性文件。配置如下：</p>
+<pre><code>spring.profiles.active = dev
+</code></pre><p>应用启动：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">//启动入口</span></div><div class="line"><span class="meta">@SpringBootApplication</span></div><div class="line"><span class="meta">@ServletComponentScan</span>    <span class="comment">//扫描Servlet</span></div><div class="line"><span class="meta">@MapperScan</span>(<span class="string">"com.springboot.demo.dao"</span>) <span class="comment">//扫描dao</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">App</span> </span></div><div class="line">&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        SpringApplication.run(App.class, args);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>启动之后访问：<br>durid ： <a href="http://localhost:8080/druid/index.html" target="_blank" rel="external">http://localhost:8080/druid/index.html</a> 如图：</p>
+<p><img src="http://i.imgur.com/qD8hyb4.png" alt=""></p>
+<p>登录之后：</p>
+<p><img src="http://i.imgur.com/Eb4k89i.png" alt=""></p>
+<p>配置代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">//过滤资源</span></div><div class="line"><span class="meta">@WebFilter</span>(filterName=<span class="string">"druidWebStatFilter"</span>,urlPatterns=<span class="string">"/*"</span>,</div><div class="line">        initParams=&#123;</div><div class="line">                <span class="meta">@WebInitParam</span>(name=<span class="string">"exclusions"</span>,value=<span class="string">"*.js,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico,/druid/*"</span>)<span class="comment">// 忽略资源</span></div><div class="line">      &#125;</div><div class="line">)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DruidStatFilter</span> <span class="keyword">extends</span> <span class="title">WebStatFilter</span> <span class="keyword">implements</span> <span class="title">Serializable</span></span>&#123;</div><div class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1L</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//配置访问路径，用户名，密码</span></div><div class="line"><span class="meta">@WebServlet</span>(urlPatterns = <span class="string">"/druid/*"</span>, </div><div class="line">	initParams=&#123;</div><div class="line">	        <span class="meta">@WebInitParam</span>(name=<span class="string">"allow"</span>,value=<span class="string">""</span>),<span class="comment">// IP白名单 (没有配置或者为空，则允许所有访问)</span></div><div class="line">	        <span class="meta">@WebInitParam</span>(name=<span class="string">"deny"</span>,value=<span class="string">""</span>),<span class="comment">// IP黑名单 (存在共同时，deny优先于allow)</span></div><div class="line">	        <span class="meta">@WebInitParam</span>(name=<span class="string">"loginUsername"</span>,value=<span class="string">"root"</span>),<span class="comment">// 用户名</span></div><div class="line">	        <span class="meta">@WebInitParam</span>(name=<span class="string">"loginPassword"</span>,value=<span class="string">"root"</span>),<span class="comment">// 密码</span></div><div class="line">	        <span class="meta">@WebInitParam</span>(name=<span class="string">"resetEnable"</span>,value=<span class="string">"false"</span>)<span class="comment">// 禁用HTML页面上的“Reset All”功能</span></div><div class="line">	&#125;)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DruidStatViewServlet</span> <span class="keyword">extends</span> <span class="title">StatViewServlet</span> <span class="keyword">implements</span> <span class="title">Serializable</span></span>&#123;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1L</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>swagger2 ： <a href="http://localhost:8080/swagger-ui.html" target="_blank" rel="external">http://localhost:8080/swagger-ui.html</a> 如图：</p>
+<p><img src="http://i.imgur.com/MkwOuR0.png" alt=""></p>
+<p><img src="http://i.imgur.com/8U2WVwG.png" alt=""></p>
+<p>配置代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">//SwaggerConfig</span></div><div class="line"><span class="meta">@Configuration</span></div><div class="line"><span class="meta">@EnableSwagger</span>2</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SwaggerConfig</span> </span>&#123;</div><div class="line">	<span class="comment">/**</span></div><div class="line">	 * 可以定义多个组，比如本类中定义把test和demo区分开了 （访问页面就可以看到效果了）</div><div class="line">	 * </div><div class="line">	 */</div><div class="line">	<span class="meta">@Bean</span></div><div class="line">	<span class="function"><span class="keyword">public</span> Docket <span class="title">testApi</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> <span class="keyword">new</span> Docket(DocumentationType.SWAGGER_2)</div><div class="line">		.apiInfo(apiInfo())</div><div class="line">		.select()</div><div class="line">		.apis(RequestHandlerSelectors</div><div class="line">				.basePackage(<span class="string">"com.springboot.demo.controller"</span>))</div><div class="line">				.paths(PathSelectors.any()).build();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">private</span> ApiInfo <span class="title">apiInfo</span><span class="params">()</span> </span>&#123;</div><div class="line">		ApiInfo apiInfo = <span class="keyword">new</span> ApiInfo(<span class="string">"SpringBootDemo"</span>, <span class="comment">// 大标题</span></div><div class="line">				<span class="string">"Spring boot + swagger + mybatis + druid"</span>, <span class="comment">// 小标题</span></div><div class="line">				<span class="string">"1.0"</span>, <span class="comment">// 版本</span></div><div class="line">				<span class="string">"spring-boot-demo"</span>,</div><div class="line">				<span class="string">"zhengweishan"</span>, <span class="comment">// 作者</span></div><div class="line">				<span class="string">"blog"</span>, <span class="comment">// 链接显示文字</span></div><div class="line">				<span class="string">"http://zhengweishan.oschina.io/"</span><span class="comment">// 网站链接</span></div><div class="line">		);</div><div class="line">		<span class="keyword">return</span> apiInfo;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>添加jsp支持</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">import</span> com.springboot.demo.App;</div><div class="line"><span class="keyword">import</span> org.springframework.boot.builder.SpringApplicationBuilder;</div><div class="line"><span class="keyword">import</span> org.springframework.boot.context.web.SpringBootServletInitializer;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * Created by wesley on 2017-03-24.</div><div class="line"> * spring boot jsp支持</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JspInitContext</span> <span class="keyword">extends</span> <span class="title">SpringBootServletInitializer</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> SpringApplicationBuilder <span class="title">configure</span><span class="params">(SpringApplicationBuilder application)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> application.sources(App.class);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>配置文件配置添加如下：</p>
+<pre><code>#jsp视图设置
+spring.mvc.view.prefix=/WEB-INF/jsp/
+spring.mvc.view.suffix=.jsp
+</code></pre>
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://zhengweishan.oschina.io/2017/03/24/spring-boot-demo/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://zhengweishan.oschina.io/2017/03/24/spring-boot-demo/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/03/27/CountDownLatch/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    java并发包里的CountDownLatch的用法
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/03/23/boy-rpc-framework/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">分布式rpc框架</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2017/03/24/spring-boot-demo/" data-title="spring boot + mybatis + quartz + druid + swagger2" data-url="http://zhengweishan.oschina.io/2017/03/24/spring-boot-demo/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/27/CountDownLatch/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/并发/">并发</a></p>
+                            <p class="item-title"><a href="/2017/03/27/CountDownLatch/" class="title">java并发包里的CountDownLatch的用法</a></p>
+                            <p class="item-date"><time datetime="2017-03-26T16:00:00.000Z" itemprop="datePublished">2017-03-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/24/spring-boot-demo/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/SpringBoot/">SpringBoot</a></p>
+                            <p class="item-title"><a href="/2017/03/24/spring-boot-demo/" class="title">spring boot + mybatis + quartz + druid + swagger2</a></p>
+                            <p class="item-date"><time datetime="2017-03-23T16:00:00.000Z" itemprop="datePublished">2017-03-24</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/23/boy-rpc-framework/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/rpc/">rpc</a></p>
+                            <p class="item-title"><a href="/2017/03/23/boy-rpc-framework/" class="title">分布式rpc框架</a></p>
+                            <p class="item-date"><time datetime="2017-03-22T16:00:00.000Z" itemprop="datePublished">2017-03-23</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/02/10/（六）Tomcat_7.0.70生命周期管理/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a></p>
+                            <p class="item-title"><a href="/2017/02/10/（六）Tomcat_7.0.70生命周期管理/" class="title">Tomcat源码学习（六）--Tomcat_7.0.70 生命周期管理</a></p>
+                            <p class="item-date"><time datetime="2017-02-09T16:00:00.000Z" itemprop="datePublished">2017-02-10</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/02/09/（五）Tomcat_7.0.70类加载体系/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a></p>
+                            <p class="item-title"><a href="/2017/02/09/（五）Tomcat_7.0.70类加载体系/" class="title">Tomcat源码学习（五）-- Tomcat_7.0.70 类加载体系分析</a></p>
+                            <p class="item-date"><time datetime="2017-02-08T16:00:00.000Z" itemprop="datePublished">2017-02-09</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Elasticsearch/">Elasticsearch</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JMS/">JMS</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JVM/">JVM</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringBoot/">SpringBoot</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tomcat源码/">Tomcat源码</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/kafka/">kafka</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/rpc/">rpc</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/并发/">并发</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/ActiveMQ/" style="font-size: 16.67px;">ActiveMQ</a> <a href="/tags/Elasticsearch学习/" style="font-size: 13.33px;">Elasticsearch学习</a> <a href="/tags/GC/" style="font-size: 13.33px;">GC</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/JAVA/" style="font-size: 16.67px;">JAVA</a> <a href="/tags/JMS/" style="font-size: 16.67px;">JMS</a> <a href="/tags/JVM/" style="font-size: 13.33px;">JVM</a> <a href="/tags/Reflection/" style="font-size: 10px;">Reflection</a> <a href="/tags/SpingBoot/" style="font-size: 10px;">SpingBoot</a> <a href="/tags/kafka/" style="font-size: 16.67px;">kafka</a> <a href="/tags/rpc-分布式/" style="font-size: 10px;">rpc 分布式</a> <a href="/tags/tomcat/" style="font-size: 20px;">tomcat</a> <a href="/tags/并发，CountDownLatch/" style="font-size: 10px;">并发，CountDownLatch</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2017 郑伟山 版权所有<br> 
+            由 <a href="http://hexo.io/" target="_blank">Hexo</a> 强力驱动 &brvbar; 主题 -- <a href="https://github.com/ppoffice/hexo-theme-icarus">Icarus</a><br>
+            
+        </div>
+		<div class="inner">
+        	<span id="busuanzi_container_site_pv">
+    			本站总访问量<span id="busuanzi_value_site_pv" class="foot-count"></span>次
+			</span>
+		</div>
+    </div>
+<script src="http://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+</footer>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'wesley-icarus'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

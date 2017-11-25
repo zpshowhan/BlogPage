@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta name="baidu-site-verification" content="lKl7jYajUz" />
+    <meta charset="utf-8">
+    
+    <title>迷失的男孩</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="keywords" content="火龙战士,zhengweishan,郑伟山的博客，bolg,博客">
+    <meta name="description" content="kafka学习（四）—- Kafka整合SpringMVC实例（二）1、概述目前没有很好的整合Kafka的案例，自己参考着使用spring-integration-kafka框架写了一个：Kafka整合SpringMVC实例，但同时也发现官方文档也不全，所以又用spring简单的实现了一下，感觉这个比使用spring-integration-kafka框架更简单一点，但是需要对kafka作深入的了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="迷失的男孩">
+<meta property="og:url" content="http://zhengweishan.oschina.io/2017/03/01/kafka学习（四）---- Kafka整合SpringMVC实例（二）/index.html">
+<meta property="og:site_name" content="迷失的男孩">
+<meta property="og:description" content="kafka学习（四）—- Kafka整合SpringMVC实例（二）1、概述目前没有很好的整合Kafka的案例，自己参考着使用spring-integration-kafka框架写了一个：Kafka整合SpringMVC实例，但同时也发现官方文档也不全，所以又用spring简单的实现了一下，感觉这个比使用spring-integration-kafka框架更简单一点，但是需要对kafka作深入的了">
+<meta property="og:image" content="http://i.imgur.com/wTOil58.png">
+<meta property="og:image" content="http://i.imgur.com/H5UagCh.png">
+<meta property="og:image" content="http://i.imgur.com/E1LMhg4.png">
+<meta property="og:updated_time" content="2016-08-23T08:37:25.855Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="迷失的男孩">
+<meta name="twitter:description" content="kafka学习（四）—- Kafka整合SpringMVC实例（二）1、概述目前没有很好的整合Kafka的案例，自己参考着使用spring-integration-kafka框架写了一个：Kafka整合SpringMVC实例，但同时也发现官方文档也不全，所以又用spring简单的实现了一下，感觉这个比使用spring-integration-kafka框架更简单一点，但是需要对kafka作深入的了">
+<meta name="twitter:image" content="http://i.imgur.com/wTOil58.png">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="迷失的男孩" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/favicon.ico" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?eb23f1849f20e62c924d275e4edef134";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">迷失的男孩</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpg" />
+            <h2 id="name">迷失的男孩</h2>
+            <h3 id="title">为API生，为框架死，为debug奋斗一辈子，吃符号亏，上大小写的当，最后死在需求上。</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>中国, 北京</span>
+            <a id="follow" target="_blank" href="https://github.com/wesley5201314">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                22
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                8
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/wesley5201314" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://git.oschina.net/zhengweishan" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/css/images/weixin.png" target="_blank" title="weixin" class=tooltip>
+                            <i class="fa fa-weixin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="http://weibo.com/wesley5201314" target="_blank" title="weibo" class=tooltip>
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-kafka学习（四）---- Kafka整合SpringMVC实例（二）" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h1 id="kafka学习（四）—-Kafka整合SpringMVC实例（二）"><a href="#kafka学习（四）—-Kafka整合SpringMVC实例（二）" class="headerlink" title="kafka学习（四）—- Kafka整合SpringMVC实例（二）"></a>kafka学习（四）—- Kafka整合SpringMVC实例（二）</h1><h2 id="1、概述"><a href="#1、概述" class="headerlink" title="1、概述"></a>1、概述</h2><p>目前没有很好的整合Kafka的案例，自己参考着使用spring-integration-kafka框架写了一个：<br><a href="http://my.oschina.net/zhengweishan/blog/736213" target="_blank" rel="external">Kafka整合SpringMVC实例</a>，但同时也发现官方文档也不全，所以又用spring简单的实现了一下，感觉这个比使用spring-integration-kafka框架更简单一点，但是需要对kafka作深入的了解，废话不多说直接切入正题。</p>
+<h2 id="2、实例"><a href="#2、实例" class="headerlink" title="2、实例"></a>2、实例</h2><p><strong>1. 安装Zookeeper</strong></p>
+<p><a href="http://my.oschina.net/zhengweishan/blog/693163" target="_blank" rel="external">Zookeeper下载基本使用</a></p>
+<p><strong>2. 安装Kafka</strong></p>
+<p><a href="http://my.oschina.net/zhengweishan/blog/731330" target="_blank" rel="external">kafka基本概念以及环境搭建</a></p>
+<p><strong>3. 创建spring项目（建议使用maven方式创建）</strong></p>
+<blockquote>
+<p>项目截图（小红叉不影响项目的启动）</p>
+</blockquote>
+<p><img src="http://i.imgur.com/wTOil58.png" alt=""></p>
+<blockquote>
+<p>pom.xml配置</p>
+</blockquote>
+<pre><code>&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+  xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd&quot;&gt;
+  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+  &lt;groupId&gt;com.kafka.demo&lt;/groupId&gt;
+  &lt;artifactId&gt;SpringWithKafka&lt;/artifactId&gt;
+  &lt;packaging&gt;war&lt;/packaging&gt;
+  &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+  &lt;name&gt;SpringWithKafka Maven Webapp&lt;/name&gt;
+  &lt;url&gt;http://maven.apache.org&lt;/url&gt;
+
+  &lt;properties&gt;
+        &lt;spring.version&gt;4.2.5.RELEASE&lt;/spring.version&gt;
+    &lt;/properties&gt;
+
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+            &lt;groupId&gt;junit&lt;/groupId&gt;
+            &lt;artifactId&gt;junit&lt;/artifactId&gt;
+            &lt;version&gt;4.11&lt;/version&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+            &lt;artifactId&gt;javax.servlet-api&lt;/artifactId&gt;
+            &lt;version&gt;3.1.0&lt;/version&gt;
+            &lt;scope&gt;provided&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;!-- spring --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-core&lt;/artifactId&gt;
+            &lt;version&gt;${spring.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-web&lt;/artifactId&gt;
+            &lt;version&gt;${spring.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-webmvc&lt;/artifactId&gt;
+            &lt;version&gt;${spring.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;!-- spring-kafka --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.kafka&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-kafka&lt;/artifactId&gt;
+            &lt;version&gt;1.0.3.RELEASE&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;!-- 日志 --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;commons-logging&lt;/groupId&gt;
+            &lt;artifactId&gt;commons-logging&lt;/artifactId&gt;
+            &lt;version&gt;1.1.1&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+            &lt;artifactId&gt;slf4j-log4j12&lt;/artifactId&gt;
+            &lt;version&gt;1.7.5&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;javax&lt;/groupId&gt;
+            &lt;artifactId&gt;javaee-api&lt;/artifactId&gt;
+            &lt;version&gt;7.0&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+            &lt;artifactId&gt;jackson-core&lt;/artifactId&gt;
+            &lt;version&gt;2.7.6&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+            &lt;artifactId&gt;jackson-databind&lt;/artifactId&gt;
+            &lt;version&gt;2.7.6&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+            &lt;artifactId&gt;jackson-annotations&lt;/artifactId&gt;
+            &lt;version&gt;2.7.6&lt;/version&gt;
+        &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+  &lt;build&gt;
+    &lt;finalName&gt;SpringWithKafka&lt;/finalName&gt;
+  &lt;/build&gt;
+&lt;/project&gt;
+</code></pre><blockquote>
+<p>kafka-producer.xml配置</p>
+</blockquote>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;  
+     xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;  
+     xmlns:context=&quot;http://www.springframework.org/schema/context&quot;  
+     xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans  
+         http://www.springframework.org/schema/beans/spring-beans.xsd  
+         http://www.springframework.org/schema/context  
+         http://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;  
+
+     &lt;context:property-placeholder location=&quot;classpath:init.properties&quot; /&gt;  
+
+     &lt;!-- 定义producer的参数 --&gt;  
+     &lt;bean id=&quot;producerProperties&quot; class=&quot;java.util.HashMap&quot;&gt;  
+        &lt;constructor-arg&gt;  
+            &lt;map&gt;  
+                &lt;entry key=&quot;bootstrap.servers&quot; value=&quot;${bootstrap.servers}&quot;/&gt;  
+                &lt;entry key=&quot;group.id&quot; value=&quot;0&quot;/&gt;  
+                &lt;entry key=&quot;retries&quot; value=&quot;10&quot;/&gt;  
+                &lt;entry key=&quot;batch.size&quot; value=&quot;16384&quot;/&gt;  
+                &lt;entry key=&quot;linger.ms&quot; value=&quot;1&quot;/&gt;  
+                &lt;entry key=&quot;buffer.memory&quot; value=&quot;33554432&quot;/&gt;  
+                &lt;entry key=&quot;key.serializer&quot; value=&quot;org.apache.kafka.common.serialization.IntegerSerializer&quot;/&gt;  
+                &lt;entry key=&quot;value.serializer&quot; value=&quot;org.apache.kafka.common.serialization.StringSerializer&quot;/&gt;  
+            &lt;/map&gt;  
+        &lt;/constructor-arg&gt;  
+     &lt;/bean&gt;  
+
+     &lt;!-- 创建kafkatemplate需要使用的producerfactory bean --&gt;  
+     &lt;bean id=&quot;producerFactory&quot; class=&quot;org.springframework.kafka.core.DefaultKafkaProducerFactory&quot;&gt;  
+        &lt;constructor-arg&gt;  
+            &lt;ref bean=&quot;producerProperties&quot;/&gt;  
+        &lt;/constructor-arg&gt;  
+     &lt;/bean&gt;  
+
+     &lt;!-- 创建kafkatemplate，使用的时候，只需要注入这个bean，即可使用template的send消息方法 --&gt;  
+     &lt;bean id=&quot;KafkaTemplate&quot; class=&quot;org.springframework.kafka.core.KafkaTemplate&quot;&gt;  
+        &lt;constructor-arg ref=&quot;producerFactory&quot;/&gt;  
+        &lt;constructor-arg name=&quot;autoFlush&quot; value=&quot;true&quot;/&gt;  
+        &lt;property name=&quot;defaultTopic&quot; value=&quot;myTopic&quot;/&gt;  
+     &lt;/bean&gt;  
+
+&lt;/beans&gt; 
+</code></pre><blockquote>
+<p>kafka-consumer.xml配置 </p>
+</blockquote>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;  
+     xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;  
+     xmlns:context=&quot;http://www.springframework.org/schema/context&quot;  
+     xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans  
+         http://www.springframework.org/schema/beans/spring-beans.xsd  
+         http://www.springframework.org/schema/context  
+         http://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;  
+
+     &lt;context:property-placeholder location=&quot;classpath:init.properties&quot; /&gt;  
+
+    &lt;!-- 定义consumer的参数 --&gt;  
+     &lt;bean id=&quot;consumerProperties&quot; class=&quot;java.util.HashMap&quot;&gt;  
+        &lt;constructor-arg&gt;  
+            &lt;map&gt;  
+                &lt;entry key=&quot;bootstrap.servers&quot; value=&quot;${bootstrap.servers}&quot;/&gt;  
+                &lt;entry key=&quot;group.id&quot; value=&quot;0&quot;/&gt;  
+                &lt;entry key=&quot;enable.auto.commit&quot; value=&quot;true&quot;/&gt;  
+                &lt;entry key=&quot;auto.commit.interval.ms&quot; value=&quot;1000&quot;/&gt;  
+                &lt;entry key=&quot;session.timeout.ms&quot; value=&quot;15000&quot;/&gt;  
+                &lt;entry key=&quot;key.deserializer&quot; value=&quot;org.apache.kafka.common.serialization.IntegerDeserializer&quot;/&gt;  
+                &lt;entry key=&quot;value.deserializer&quot; value=&quot;org.apache.kafka.common.serialization.StringDeserializer&quot;/&gt;  
+            &lt;/map&gt;  
+        &lt;/constructor-arg&gt;  
+     &lt;/bean&gt;  
+
+     &lt;!-- 创建consumerFactory bean --&gt;  
+     &lt;bean id=&quot;consumerFactory&quot; class=&quot;org.springframework.kafka.core.DefaultKafkaConsumerFactory&quot;&gt;  
+        &lt;constructor-arg&gt;  
+            &lt;ref bean=&quot;consumerProperties&quot;/&gt;  
+        &lt;/constructor-arg&gt;  
+     &lt;/bean&gt;  
+
+     &lt;!-- 实际执行消息消费的类 --&gt;  
+     &lt;bean id=&quot;messageListernerConsumerService&quot; class=&quot;com.kafka.demo.service.KafkaConsumerService&quot;/&gt;  
+
+     &lt;!-- 消费者容器配置信息 --&gt;  
+     &lt;bean id=&quot;containerProperties&quot; class=&quot;org.springframework.kafka.listener.config.ContainerProperties&quot;&gt;  
+        &lt;constructor-arg value=&quot;myTopic&quot;/&gt;  
+        &lt;property name=&quot;messageListener&quot; ref=&quot;messageListernerConsumerService&quot;/&gt;  
+     &lt;/bean&gt;  
+
+     &lt;!-- 注册消费者容器到监听器 --&gt;  
+     &lt;bean id=&quot;messageListenerContainer&quot; class=&quot;org.springframework.kafka.listener.KafkaMessageListenerContainer&quot; init-method=&quot;doStart&quot;&gt;  
+        &lt;constructor-arg ref=&quot;consumerFactory&quot;/&gt;  
+        &lt;constructor-arg ref=&quot;containerProperties&quot;/&gt;  
+     &lt;/bean&gt;  
+
+&lt;/beans&gt;  
+</code></pre><p>其他代码请参看实例源码：<a href="http://git.oschina.net/zhengweishan/Kafka_study_demo" target="_blank" rel="external">源码下载</a></p>
+<h2 id="三、实例演示"><a href="#三、实例演示" class="headerlink" title="三、实例演示"></a>三、实例演示</h2><p>a、运行项目访问 <a href="http://localhost:8080/SpringMvcWithKafka/kafka/test" target="_blank" rel="external">http://localhost:8080/SpringMvcWithKafka/kafka/test</a> //测试地址<br>效果如图：</p>
+<p><img src="http://i.imgur.com/H5UagCh.png" alt=""></p>
+<p>b、查看kafka控制台信息输出,如下图：</p>
+<p><img src="http://i.imgur.com/E1LMhg4.png" alt=""></p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://zhengweishan.oschina.io/2017/03/01/kafka学习（四）---- Kafka整合SpringMVC实例（二）/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://zhengweishan.oschina.io/2017/03/01/kafka学习（四）---- Kafka整合SpringMVC实例（二）/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2017/03/01/kafka学习(一) ---- 基本概念以及环境搭建/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title"></div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2017/03/01/kafka学习（四）---- Kafka整合SpringMVC实例（二）/" data-title="" data-url="http://zhengweishan.oschina.io/2017/03/01/kafka学习（四）---- Kafka整合SpringMVC实例（二）/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习（四）---- Kafka整合SpringMVC实例（二）/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习（四）---- Kafka整合SpringMVC实例（二）/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.035Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习(一) ---- 基本概念以及环境搭建/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习(一) ---- 基本概念以及环境搭建/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.035Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习（三）---- Kafka整合SpringMVC实例/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习（三）---- Kafka整合SpringMVC实例/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.034Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.026Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/JMS学习（四）Spring和ActiveMQ整合的完整实例/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/JMS学习（四）Spring和ActiveMQ整合的完整实例/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.025Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Elasticsearch/">Elasticsearch</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JMS/">JMS</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JVM/">JVM</a><span class="category-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/ActiveMQ/" style="font-size: 10px;">ActiveMQ</a> <a href="/tags/Elasticsearch学习/" style="font-size: 15px;">Elasticsearch学习</a> <a href="/tags/GC/" style="font-size: 15px;">GC</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/JAVA/" style="font-size: 20px;">JAVA</a> <a href="/tags/JMS/" style="font-size: 10px;">JMS</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Reflection/" style="font-size: 10px;">Reflection</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2017 郑伟山 版权所有<br> 
+            由 <a href="http://hexo.io/" target="_blank">Hexo</a> 强力驱动 &brvbar; 主题 -- <a href="https://github.com/ppoffice/hexo-theme-icarus">Icarus</a><br>
+            
+        </div>
+		<div class="inner">
+        	<span id="busuanzi_container_site_pv">
+    			本站总访问量<span id="busuanzi_value_site_pv" class="foot-count"></span>次
+			</span> &brvbar;
+			<span id="busuanzi_container_site_uv">
+  				您是本站第<span id="busuanzi_value_site_uv" class="foot-count"></span>位访客
+			</span>
+		</div>
+    </div>
+</footer>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'wesley-icarus'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

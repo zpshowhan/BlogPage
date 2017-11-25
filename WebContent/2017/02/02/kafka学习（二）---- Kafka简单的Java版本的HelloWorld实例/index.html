@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta name="baidu-site-verification" content="lKl7jYajUz" />
+    <meta charset="utf-8">
+    
+    <title>kafka学习（二）---- Kafka简单的Java版本的Hello World实例 | 迷失的男孩</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="keywords" content="火龙战士,zhengweishan,郑伟山的博客，bolg,博客">
+    <meta name="description" content="1、开发环境我使用的是官网的kafka_2.11-0.10.0.0版本，最新的是kafka_2.11-0.10.0.1版本，大家自行下载安装配置。点击进入下载地址，点击进入如何win下配置开发环境
+##2、 创建项目 ##两种方式：
+（a）普通的方式创建
+
+注意：开发时候，需要将下载kafka-2.11-0.10.0.0.jar包加入到classpath下面，这个包包含了所有Kafka的api的实">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kafka学习（二）---- Kafka简单的Java版本的Hello World实例">
+<meta property="og:url" content="http://zhengweishan.oschina.io/2017/02/02/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/index.html">
+<meta property="og:site_name" content="迷失的男孩">
+<meta property="og:description" content="1、开发环境我使用的是官网的kafka_2.11-0.10.0.0版本，最新的是kafka_2.11-0.10.0.1版本，大家自行下载安装配置。点击进入下载地址，点击进入如何win下配置开发环境
+##2、 创建项目 ##两种方式：
+（a）普通的方式创建
+
+注意：开发时候，需要将下载kafka-2.11-0.10.0.0.jar包加入到classpath下面，这个包包含了所有Kafka的api的实">
+<meta property="og:image" content="http://i.imgur.com/Jjzv5Gv.png">
+<meta property="og:image" content="http://i.imgur.com/R74N0K3.png">
+<meta property="og:image" content="http://i.imgur.com/EAEoUzo.png">
+<meta property="og:image" content="http://i.imgur.com/TV4V8aL.png">
+<meta property="og:image" content="http://i.imgur.com/TGZSlHp.png">
+<meta property="og:image" content="http://i.imgur.com/t4OVBh1.png">
+<meta property="og:image" content="http://i.imgur.com/DujHiGq.png">
+<meta property="og:image" content="http://i.imgur.com/42cPZ1T.png">
+<meta property="og:updated_time" content="2017-03-01T08:41:22.175Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kafka学习（二）---- Kafka简单的Java版本的Hello World实例">
+<meta name="twitter:description" content="1、开发环境我使用的是官网的kafka_2.11-0.10.0.0版本，最新的是kafka_2.11-0.10.0.1版本，大家自行下载安装配置。点击进入下载地址，点击进入如何win下配置开发环境
+##2、 创建项目 ##两种方式：
+（a）普通的方式创建
+
+注意：开发时候，需要将下载kafka-2.11-0.10.0.0.jar包加入到classpath下面，这个包包含了所有Kafka的api的实">
+<meta name="twitter:image" content="http://i.imgur.com/Jjzv5Gv.png">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="迷失的男孩" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/favicon.ico" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="alternate stylesheet" href="http://cdn.bootcss.com/highlight.js/8.0/styles/monokai_sublime.min.css" title="highlight" />
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?eb23f1849f20e62c924d275e4edef134";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">迷失的男孩</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpg" />
+            <h2 id="name">迷失的男孩</h2>
+            <h3 id="title">为API生，为框架死，为debug奋斗一辈子，吃符号亏，上大小写的当，最后死在需求上。</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>中国, 北京</span>
+            <a id="follow" target="_blank" href="https://github.com/wesley5201314">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                25
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                13
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/wesley5201314" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://git.oschina.net/zhengweishan" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/css/images/weixin.png" target="_blank" title="weixin" class=tooltip>
+                            <i class="fa fa-weixin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="http://weibo.com/wesley5201314" target="_blank" title="weibo" class=tooltip>
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+        <div class="base-info" style="text-align:center">
+        <span style="color:#38b7ea">今天是：
+                 <script type="text/javascript">
+                　　today=new Date(); 
+                    var tdate,tday, x,year; 
+                    var x = new Array("星期日", "星期一", "星期二", "星期三", "星期四", "星期五","星期六");
+                　　var MSIE=navigator.userAgent.indexOf("MSIE");
+                    if(MSIE != -1)
+                    　year =(today.getFullYear());
+                    else
+                    　year = (today.getYear()+1900);
+                    　tdate= year+ "年" + (today.getMonth() + 1 ) + "月" + today.getDate() + "日" + " " + x[today.getDay()];
+                    　document.write(tdate); 
+                </script>
+        </span> 
+        </div>
+        <div class="base-info" style="text-align:center">
+                <span style="color:#38b7ea;"><script type="text/javascript">
+                    today=new Date();
+                    var day; var date; var hello;
+                    hour=new Date().getHours()
+                    if(hour < 6)hello='  凌晨好! '
+                    else if(hour < 9)hello=' 早上好! '
+                    else if(hour < 12)hello=' 上午好! '
+                    else if(hour < 14)hello=' 中午好! '
+                    else if(hour < 17)hello=' 下午好! '
+                    else if(hour < 19)hello=' 傍晚好! '
+                    else if(hour < 22)hello=' 晚上好! '
+                    else {hello='夜深了! '}
+                    var webUrl = webUrl;
+                    document.write(' '+hello);
+                </script>
+                </span>
+            <span id="busuanzi_container_site_uv">
+                您是本站第<span id="busuanzi_value_site_uv" class="foot-count"></span>位访客
+            </span>
+        </div>
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            kafka学习（二）---- Kafka简单的Java版本的Hello World实例
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/02/02/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/">
+            <time datetime="2017-02-01T16:00:00.000Z" itemprop="datePublished">2017-02-02</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/kafka/">kafka</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/kafka/">kafka</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h2 id="1、开发环境"><a href="#1、开发环境" class="headerlink" title="1、开发环境"></a>1、开发环境</h2><p>我使用的是官网的kafka_2.11-0.10.0.0版本，最新的是kafka_2.11-0.10.0.1版本，大家自行下载安装配置。<a href="http://kafka.apache.org/downloads.html" target="_blank" rel="external">点击进入下载地址</a>，<a href="http://my.oschina.net/zhengweishan/blog/731330" target="_blank" rel="external">点击进入如何win下配置开发环境</a></p>
+<p>##2、 创建项目 ##<br>两种方式：</p>
+<p><strong>（a）普通的方式创建</strong></p>
+<blockquote>
+<p>注意：开发时候，需要将下载kafka-2.11-0.10.0.0.jar包加入到classpath下面，这个包包含了所有Kafka的api的实现。由于kafka是使用Scala编写的，所以可能下载的kafka中的libs文件中的kafka-2.11-0.10.0.0.jar放到项目中不能用，而且还依赖scala-library-2.11.8.jar，所以推荐使用第二种方式构建项目。</p>
+</blockquote>
+<p>项目结构图：</p>
+<p><img src="http://i.imgur.com/Jjzv5Gv.png" alt=""></p>
+<p><strong>(b)maven构建项目</strong><br>maven下载配置这里不再叙述，请参看：<a href="http://my.oschina.net/zhengweishan/blog/690195" target="_blank" rel="external">eclipse创建maven多模块项目</a>中有关maven的介绍。好处在于不用自己去添加依赖了，maven自己帮我们加载依赖。</p>
+<p>项目结构图：</p>
+<p><img src="http://i.imgur.com/R74N0K3.png" alt=""></p>
+<a id="more"></a>
+<h2 id="3、实例源码"><a href="#3、实例源码" class="headerlink" title="3、实例源码"></a>3、实例源码</h2><h3 id="3-1-生产者"><a href="#3-1-生产者" class="headerlink" title="3.1 生产者"></a>3.1 生产者</h3><pre><code>package com.kafka.demo;
+
+import java.util.Date;
+import java.util.Properties;
+
+import kafka.javaapi.producer.Producer;
+import kafka.producer.KeyedMessage;
+import kafka.producer.ProducerConfig;
+
+/**
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/0.8.0+Producer+Example
+ * @see http://kafka.apache.org/documentation.html#producerapi
+ * @author wesley
+ *
+ */
+public class ProducerDemo {
+    @SuppressWarnings(&quot;deprecation&quot;)
+    public static void main(String[] args) {
+        int events = 20;
+        // @see http://kafka.apache.org/08/configuration.html-- 3.3 Producer
+        // Configs
+        // @see http://kafka.apache.org/documentation.html#producerconfigs
+        // 设置配置属性
+        Properties props = new Properties();
+        props.put(&quot;metadata.broker.list&quot;, &quot;127.0.0.1:9092&quot;); // 配置kafka的IP和端口
+        props.put(&quot;serializer.class&quot;, &quot;kafka.serializer.StringEncoder&quot;);
+        // key.serializer.class默认为serializer.class
+        props.put(&quot;key.serializer.class&quot;, &quot;kafka.serializer.StringEncoder&quot;);
+        // 可选配置，如果不配置，则使用默认的partitioner
+        props.put(&quot;partitioner.class&quot;, &quot;com.kafka.demo.PartitionerDemo&quot;);
+        // 触发acknowledgement机制，否则是fire and forget，可能会引起数据丢失
+        // 值为0,1,-1,可以参考
+        props.put(&quot;request.required.acks&quot;, &quot;1&quot;);
+        ProducerConfig config = new ProducerConfig(props);
+
+        // 创建producer
+        Producer&lt;String, String&gt; producer = new Producer&lt;String, String&gt;(config);
+        // 产生并发送消息
+        long start = System.currentTimeMillis();
+        for (long i = 0; i &lt; events; i++) {
+            long runtime = new Date().getTime();
+            String ip = &quot;192.168.1.&quot; + i;
+            String msg = runtime + &quot;--www.kafkademo.com--&quot; + ip;
+            // 如果topic不存在，则会自动创建，默认replication-factor为1，partitions为0
+            KeyedMessage&lt;String, String&gt; data = new KeyedMessage&lt;String, String&gt;(&quot;page_visits&quot;, ip, msg);
+            System.out.println(&quot;-----Kafka Producer----createMessage----&quot; + data);
+            producer.send(data);
+        }
+        System.out.println(&quot;Time consuming:&quot; + (System.currentTimeMillis() - start));
+        // 关闭producer
+        producer.close();
+    }
+}
+</code></pre><h3 id="3-2-生产者需要配置的Partition类"><a href="#3-2-生产者需要配置的Partition类" class="headerlink" title="3.2 生产者需要配置的Partition类"></a>3.2 生产者需要配置的Partition类</h3><pre><code>package com.kafka.demo;
+
+import kafka.producer.Partitioner;
+import kafka.utils.VerifiableProperties;
+
+@SuppressWarnings(&quot;deprecation&quot;)
+public class PartitionerDemo implements Partitioner {
+
+    public PartitionerDemo (VerifiableProperties props) {
+
+    }
+
+    public int partition(Object key, int a_numPartitions) {
+        int partition = 0;
+        String stringKey = (String) key;
+        int offset = stringKey.lastIndexOf(&apos;.&apos;);
+        if (offset &gt; 0) {
+           partition = Integer.parseInt( stringKey.substring(offset+1)) % a_numPartitions;
+        }
+       return partition;
+  }
+
+}
+</code></pre><h4 id="运行之后的效果："><a href="#运行之后的效果：" class="headerlink" title="运行之后的效果："></a>运行之后的效果：</h4><p><img src="http://i.imgur.com/EAEoUzo.png" alt=""></p>
+<h4 id="查看控制台："><a href="#查看控制台：" class="headerlink" title="查看控制台："></a>查看控制台：</h4><p><img src="http://i.imgur.com/TV4V8aL.png" alt=""></p>
+<blockquote>
+<p>红色部分就是新生成的待消费的信息。</p>
+</blockquote>
+<h3 id="3-3-消费者-单线程实例"><a href="#3-3-消费者-单线程实例" class="headerlink" title="3.3 消费者(单线程实例)"></a>3.3 消费者(单线程实例)</h3><pre><code>package com.kafka.demo;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import kafka.consumer.ConsumerConfig;
+import kafka.consumer.ConsumerIterator;
+import kafka.consumer.KafkaStream;
+import kafka.javaapi.consumer.ConsumerConnector;
+/**
+ * @see http://kafka.apache.org/documentation.html#consumerapi
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/Consumer+Group+Example
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/0.8.0+SimpleConsumer+Example
+ * @author wesley
+ *
+ */
+public class ConsumerSimpleDemo extends Thread {
+    // 消费者连接
+    private final ConsumerConnector consumer;
+    // 要消费的话题
+    private final String topic;
+
+    public ConsumerSimpleDemo(String topic) {
+        consumer = kafka.consumer.Consumer.createJavaConsumerConnector(createConsumerConfig());
+        this.topic = topic;
+    }
+
+    // 配置相关信息
+    private static ConsumerConfig createConsumerConfig() {
+        Properties props = new Properties();
+        // props.put(&quot;zookeeper.connect&quot;,&quot;localhost:2181,10.XX.XX.XX:2181,10.XX.XX.XX:2181&quot;);
+        // 配置要连接的zookeeper地址与端口
+        props.put(&quot;zookeeper.connect&quot;, &quot;127.0.0.1:2181&quot;);
+        // 配置zookeeper的组id
+        props.put(&quot;group.id&quot;, &quot;group-1&quot;);
+        // 配置zookeeper连接超时间隔
+        props.put(&quot;zookeeper.session.timeout.ms&quot;, &quot;10000&quot;);
+        // 配置zookeeper异步执行时间
+        props.put(&quot;zookeeper.sync.time.ms&quot;, &quot;200&quot;);
+        // 配置自动提交时间间隔
+        props.put(&quot;auto.commit.interval.ms&quot;, &quot;1000&quot;);
+        return new ConsumerConfig(props);
+    }
+
+    public void run() {
+
+        Map&lt;String, Integer&gt; topickMap = new HashMap&lt;String, Integer&gt;();
+        topickMap.put(topic, 1);
+        Map&lt;String, List&lt;KafkaStream&lt;byte[], byte[]&gt;&gt;&gt; streamMap = consumer.createMessageStreams(topickMap);
+
+        KafkaStream&lt;byte[], byte[]&gt; stream = streamMap.get(topic).get(0);
+        ConsumerIterator&lt;byte[], byte[]&gt; it = stream.iterator();
+        System.out.println(&quot;*********Results********&quot;);
+        while (true) {
+            if (it.hasNext()) {
+                // 打印得到的消息
+                System.err.println(Thread.currentThread() + &quot; get data:&quot; + new String(it.next().message()));
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        ConsumerSimpleDemo consumerThread = new ConsumerSimpleDemo(&quot;page_visits&quot;);
+        consumerThread.start();
+    }
+}
+</code></pre><h4 id="运行之后的效果：-1"><a href="#运行之后的效果：-1" class="headerlink" title="运行之后的效果："></a>运行之后的效果：</h4><p><img src="http://i.imgur.com/TGZSlHp.png" alt=""></p>
+<h3 id="3-4-消费者-线程池实例"><a href="#3-4-消费者-线程池实例" class="headerlink" title="3.4 消费者(线程池实例)"></a>3.4 消费者(线程池实例)</h3><pre><code>package com.kafka.demo;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import kafka.consumer.Consumer;
+import kafka.consumer.ConsumerConfig;
+import kafka.consumer.KafkaStream;
+import kafka.javaapi.consumer.ConsumerConnector;
+
+/* https://cwiki.apache.org/confluence/display/KAFKA/Consumer+Group+Example
+ * http://kafka.apache.org/documentation.html#consumerapi
+ */
+public class ConsumerDemo {
+    private final ConsumerConnector consumer;
+    private final String topic;
+    private ExecutorService executor;
+
+    public ConsumerDemo(String a_zookeeper, String a_groupId, String a_topic) {
+        consumer = Consumer.createJavaConsumerConnector(createConsumerConfig(a_zookeeper,a_groupId));
+        this.topic = a_topic;
+    }
+
+    public void shutdown() {
+        if (consumer != null)
+            consumer.shutdown();
+        if (executor != null)
+            executor.shutdown();
+        try {
+            if (!executor.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
+                System.out.println(&quot;Timed out waiting for consumer threads to shut down, exiting uncleanly&quot;);
+            }
+        } catch (InterruptedException e) {
+            System.out.println(&quot;Interrupted during shutdown, exiting uncleanly&quot;);
+        }
+    }
+
+    public void run(int numThreads) {
+        System.out.println(&quot;-----Consumers begin to execute-------&quot;);
+        Map&lt;String, Integer&gt; topicCountMap = new HashMap&lt;String, Integer&gt;();
+        topicCountMap.put(topic, new Integer(numThreads));
+        Map&lt;String, List&lt;KafkaStream&lt;byte[], byte[]&gt;&gt;&gt; consumerMap = consumer
+                .createMessageStreams(topicCountMap);
+        List&lt;KafkaStream&lt;byte[], byte[]&gt;&gt; streams = consumerMap.get(topic);
+        System.err.println(&quot;-----Need to consume content----&quot;+streams);
+
+        // now launch all the threads
+        executor = Executors.newFixedThreadPool(numThreads);
+
+        // now create an object to consume the messages
+        int threadNumber = 0;
+        for (final KafkaStream&lt;byte[], byte[]&gt; stream : streams) {
+            System.out.println(&quot;-----Consumers begin to consume-------&quot;+stream);
+            executor.submit(new ConsumerMsgTask(stream, threadNumber));
+            threadNumber++;
+        }
+    }
+
+    private static ConsumerConfig createConsumerConfig(String a_zookeeper,
+            String a_groupId) {
+        Properties props = new Properties();
+        // see http://kafka.apache.org/08/configuration.html --3.2 Consumer Configs
+        // http://kafka.apache.org/documentation.html#consumerconfigs
+        props.put(&quot;zookeeper.connect&quot;, a_zookeeper); //配置ZK地址
+        props.put(&quot;group.id&quot;, a_groupId); //必填字段
+        props.put(&quot;zookeeper.session.timeout.ms&quot;, &quot;400&quot;);
+        props.put(&quot;zookeeper.sync.time.ms&quot;, &quot;200&quot;);
+        props.put(&quot;auto.commit.interval.ms&quot;, &quot;1000&quot;);
+        return new ConsumerConfig(props);
+    }
+
+    public static void main(String[] arg) {
+        String[] args = { &quot;127.0.0.1:2181&quot;, &quot;group-1&quot;, &quot;page_visits&quot;, &quot;10&quot; };
+        String zooKeeper = args[0];
+        String groupId = args[1];
+        String topic = args[2];
+        int threads = Integer.parseInt(args[3]);
+
+        ConsumerDemo demo = new ConsumerDemo(zooKeeper, groupId, topic);
+        demo.run(threads);
+
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException ie) {
+
+        }
+        demo.shutdown();
+    }
+}
+</code></pre><blockquote>
+<p>注意：这里要调用处理消息的类</p>
+</blockquote>
+<h3 id="3-5-处理消息的类"><a href="#3-5-处理消息的类" class="headerlink" title="3.5 处理消息的类"></a>3.5 处理消息的类</h3><pre><code>package com.kafka.demo;
+
+import kafka.consumer.ConsumerIterator;
+import kafka.consumer.KafkaStream;
+
+public class ConsumerMsgTask implements Runnable {
+
+    private KafkaStream&lt;byte[], byte[]&gt; m_stream;
+    private int m_threadNumber;
+
+    public ConsumerMsgTask(KafkaStream&lt;byte[], byte[]&gt; stream, int threadNumber) {
+        m_threadNumber = threadNumber;
+        m_stream = stream;
+    }
+
+    public void run() {
+        System.out.println(&quot;-----Consumers begin to consume-------&quot;);
+        ConsumerIterator&lt;byte[], byte[]&gt; it = m_stream.iterator();
+        while (it.hasNext()){
+            System.out.println(&quot;Thread &quot; + m_threadNumber + &quot;: &quot;+ new String(it.next().message()));
+        }
+        System.out.println(&quot;Shutting down Thread: &quot; + m_threadNumber);
+    }
+
+}
+</code></pre><h4 id="运行效果图："><a href="#运行效果图：" class="headerlink" title="运行效果图："></a>运行效果图：</h4><p><img src="http://i.imgur.com/t4OVBh1.png" alt=""></p>
+<p><img src="http://i.imgur.com/DujHiGq.png" alt=""></p>
+<p><img src="http://i.imgur.com/42cPZ1T.png" alt=""></p>
+<p>实例到此结束，大家可以多看看kafka的文档，多了解一些kafka的知识，这里只是演示了怎么用，其实也都是文档中的东西，自己总结了一下。</p>
+<p><strong>说明</strong>：</p>
+<p>为什么使用High Level Consumer？</p>
+<p>有些场景下，从Kafka中读取消息的逻辑不处理消息的offset，仅仅是获取消息数据。High Level Consumer就提供了这种功能。首先要知道的是，High Level Consumer在ZooKeeper上保存最新的offset（从指定的分区中读取）。这个offset基于consumer group名存储。Consumer group名在Kafka集群上是全局性的，在启动新的consumer group的时候要小心集群上没有关闭的consumer。当一个consumer线程启动了，Kafka会将它加入到相同的topic下的相同consumer group里，并且触发重新分配。在重新分配时，Kafka将partition分配给consumer，有可能会移动一个partition给另一个consumer。如果老的、新的处理逻辑同时存在，有可能一些消息传递到了老的consumer上。使用High LevelConsumer首先要知道的是，它应该是多线程的。消费者线程的数量跟tipic的partition数量有关，它们之间有一些特定的规则：</p>
+<ul>
+<li><p>如果线程数量大于主题的分区数量，一些线程将得不到任何消息</p>
+</li>
+<li><p>如果分区数大于线程数，一些线程将得到多个分区的消息</p>
+</li>
+<li><p>如果一个线程处理多个分区的消息，它接收到消息的顺序是不能保证的。比如，先从分区10获取了5条消息，从分区11获取了6条消息，然后从分区10获取了5条，紧接着又从分区10获取了5条，虽然分区11还有消息。</p>
+</li>
+<li><p>添加更多了同consumer group的consumer将触发Kafka重新分配，某个分区本来分配给a线程的，从新分配后，有可能分配给了b线程。</p>
+</li>
+</ul>
+<h2 id="4、参考资料："><a href="#4、参考资料：" class="headerlink" title="4、参考资料："></a>4、参考资料：</h2><ol>
+<li><a href="http://kafka.apache.org/documentation.html" target="_blank" rel="external">http://kafka.apache.org/documentation.html</a></li>
+<li><a href="https://cwiki.apache.org/confluence/display/KAFKA/Index" target="_blank" rel="external">https://cwiki.apache.org/confluence/display/KAFKA/Index</a></li>
+</ol>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://zhengweishan.oschina.io/2017/02/02/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://zhengweishan.oschina.io/2017/02/02/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/02/03/kafka学习（三）---- Kafka整合SpringMVC实例/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    kafka学习（三）----- Kafka整合SpringMVC实例
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/02/01/kafka学习(一) ---- 基本概念以及环境搭建/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">kafka学习(一) ---- 基本概念以及环境搭建</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2017/02/02/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/" data-title="kafka学习（二）---- Kafka简单的Java版本的Hello World实例" data-url="http://zhengweishan.oschina.io/2017/02/02/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/27/CountDownLatch/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/并发/">并发</a></p>
+                            <p class="item-title"><a href="/2017/03/27/CountDownLatch/" class="title">java并发包里的CountDownLatch的用法</a></p>
+                            <p class="item-date"><time datetime="2017-03-26T16:00:00.000Z" itemprop="datePublished">2017-03-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/24/spring-boot-demo/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/SpringBoot/">SpringBoot</a></p>
+                            <p class="item-title"><a href="/2017/03/24/spring-boot-demo/" class="title">spring boot + mybatis + quartz + druid + swagger2</a></p>
+                            <p class="item-date"><time datetime="2017-03-23T16:00:00.000Z" itemprop="datePublished">2017-03-24</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/23/boy-rpc-framework/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/rpc/">rpc</a></p>
+                            <p class="item-title"><a href="/2017/03/23/boy-rpc-framework/" class="title">分布式rpc框架</a></p>
+                            <p class="item-date"><time datetime="2017-03-22T16:00:00.000Z" itemprop="datePublished">2017-03-23</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/02/10/（六）Tomcat_7.0.70生命周期管理/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a></p>
+                            <p class="item-title"><a href="/2017/02/10/（六）Tomcat_7.0.70生命周期管理/" class="title">Tomcat源码学习（六）--Tomcat_7.0.70 生命周期管理</a></p>
+                            <p class="item-date"><time datetime="2017-02-09T16:00:00.000Z" itemprop="datePublished">2017-02-10</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/02/09/（五）Tomcat_7.0.70类加载体系/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a></p>
+                            <p class="item-title"><a href="/2017/02/09/（五）Tomcat_7.0.70类加载体系/" class="title">Tomcat源码学习（五）-- Tomcat_7.0.70 类加载体系分析</a></p>
+                            <p class="item-date"><time datetime="2017-02-08T16:00:00.000Z" itemprop="datePublished">2017-02-09</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Elasticsearch/">Elasticsearch</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JMS/">JMS</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JVM/">JVM</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringBoot/">SpringBoot</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tomcat源码/">Tomcat源码</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/kafka/">kafka</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/rpc/">rpc</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/并发/">并发</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/ActiveMQ/" style="font-size: 16.67px;">ActiveMQ</a> <a href="/tags/Elasticsearch学习/" style="font-size: 13.33px;">Elasticsearch学习</a> <a href="/tags/GC/" style="font-size: 13.33px;">GC</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/JAVA/" style="font-size: 16.67px;">JAVA</a> <a href="/tags/JMS/" style="font-size: 16.67px;">JMS</a> <a href="/tags/JVM/" style="font-size: 13.33px;">JVM</a> <a href="/tags/Reflection/" style="font-size: 10px;">Reflection</a> <a href="/tags/SpingBoot/" style="font-size: 10px;">SpingBoot</a> <a href="/tags/kafka/" style="font-size: 16.67px;">kafka</a> <a href="/tags/rpc-分布式/" style="font-size: 10px;">rpc 分布式</a> <a href="/tags/tomcat/" style="font-size: 20px;">tomcat</a> <a href="/tags/并发，CountDownLatch/" style="font-size: 10px;">并发，CountDownLatch</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2017 郑伟山 版权所有<br> 
+            由 <a href="http://hexo.io/" target="_blank">Hexo</a> 强力驱动 &brvbar; 主题 -- <a href="https://github.com/ppoffice/hexo-theme-icarus">Icarus</a><br>
+            
+        </div>
+		<div class="inner">
+        	<span id="busuanzi_container_site_pv">
+    			本站总访问量<span id="busuanzi_value_site_pv" class="foot-count"></span>次
+			</span>
+		</div>
+    </div>
+<script src="http://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+</footer>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'wesley-icarus'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

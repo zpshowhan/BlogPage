@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta name="baidu-site-verification" content="lKl7jYajUz" />
+    <meta charset="utf-8">
+    
+    <title>迷失的男孩</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="keywords" content="火龙战士,zhengweishan,郑伟山的博客，bolg,博客">
+    <meta name="description" content="Tomcat源码学习（六）–Tomcat_7.0.70 生命周期管理想必大家都知道，从server.xml文件解析出来的各个对象都是容器，比如：Server、Service、Connector等。这些容器都具有新建、初始化完成、启动、停止、失败、销毁等状态。Tomcat的实现机制是通过实现org.apache.catalina.Lifecycle接口来管理。
+Tomcat–Lifecycle接口定">
+<meta property="og:type" content="article">
+<meta property="og:title" content="迷失的男孩">
+<meta property="og:url" content="http://zhengweishan.oschina.io/2017/03/01/（六）Tomcat_7.0.70生命周期管理/index.html">
+<meta property="og:site_name" content="迷失的男孩">
+<meta property="og:description" content="Tomcat源码学习（六）–Tomcat_7.0.70 生命周期管理想必大家都知道，从server.xml文件解析出来的各个对象都是容器，比如：Server、Service、Connector等。这些容器都具有新建、初始化完成、启动、停止、失败、销毁等状态。Tomcat的实现机制是通过实现org.apache.catalina.Lifecycle接口来管理。
+Tomcat–Lifecycle接口定">
+<meta property="og:image" content="http://i.imgur.com/ZIi07NG.jpg">
+<meta property="og:image" content="http://i.imgur.com/nHRPZr2.jpg">
+<meta property="og:image" content="http://i.imgur.com/qSZYYc3.jpg">
+<meta property="og:image" content="http://i.imgur.com/tKjahP2.jpg">
+<meta property="og:updated_time" content="2016-07-18T09:51:54.563Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="迷失的男孩">
+<meta name="twitter:description" content="Tomcat源码学习（六）–Tomcat_7.0.70 生命周期管理想必大家都知道，从server.xml文件解析出来的各个对象都是容器，比如：Server、Service、Connector等。这些容器都具有新建、初始化完成、启动、停止、失败、销毁等状态。Tomcat的实现机制是通过实现org.apache.catalina.Lifecycle接口来管理。
+Tomcat–Lifecycle接口定">
+<meta name="twitter:image" content="http://i.imgur.com/ZIi07NG.jpg">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="迷失的男孩" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/favicon.ico" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?eb23f1849f20e62c924d275e4edef134";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">迷失的男孩</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpg" />
+            <h2 id="name">迷失的男孩</h2>
+            <h3 id="title">为API生，为框架死，为debug奋斗一辈子，吃符号亏，上大小写的当，最后死在需求上。</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>中国, 北京</span>
+            <a id="follow" target="_blank" href="https://github.com/wesley5201314">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                22
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                8
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/wesley5201314" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://git.oschina.net/zhengweishan" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/css/images/weixin.png" target="_blank" title="weixin" class=tooltip>
+                            <i class="fa fa-weixin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="http://weibo.com/wesley5201314" target="_blank" title="weibo" class=tooltip>
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-（六）Tomcat_7.0.70生命周期管理" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h1 id="Tomcat源码学习（六）–Tomcat-7-0-70-生命周期管理"><a href="#Tomcat源码学习（六）–Tomcat-7-0-70-生命周期管理" class="headerlink" title="Tomcat源码学习（六）–Tomcat_7.0.70 生命周期管理"></a>Tomcat源码学习（六）–Tomcat_7.0.70 生命周期管理</h1><p><strong>想必大家都知道，从server.xml文件解析出来的各个对象都是容器，比如：Server、Service、Connector等。这些容器都具有新建、初始化完成、启动、停止、失败、销毁等状态。Tomcat的实现机制是通过实现org.apache.catalina.Lifecycle接口来管理。</strong></p>
+<h2 id="Tomcat–Lifecycle接口"><a href="#Tomcat–Lifecycle接口" class="headerlink" title="Tomcat–Lifecycle接口"></a>Tomcat–Lifecycle接口</h2><p>定义了容器生命周期、容器状态转换及容器状态迁移事件的监听器注册和移除等主要接口。代码清单：</p>
+<pre><code>    public interface Lifecycle {
+
+    public static final String BEFORE_INIT_EVENT = &quot;before_init&quot;;
+
+    public static final String AFTER_INIT_EVENT = &quot;after_init&quot;;
+
+    public static final String START_EVENT = &quot;start&quot;;
+
+    public static final String BEFORE_START_EVENT = &quot;before_start&quot;;
+
+    public static final String AFTER_START_EVENT = &quot;after_start&quot;;
+
+    public static final String STOP_EVENT = &quot;stop&quot;;
+
+    public static final String BEFORE_STOP_EVENT = &quot;before_stop&quot;;
+
+    public static final String AFTER_STOP_EVENT = &quot;after_stop&quot;;
+
+    public static final String AFTER_DESTROY_EVENT = &quot;after_destroy&quot;;
+
+    public static final String BEFORE_DESTROY_EVENT = &quot;before_destroy&quot;;
+
+    public static final String PERIODIC_EVENT = &quot;periodic&quot;;
+
+    public static final String CONFIGURE_START_EVENT = &quot;configure_start&quot;;
+
+    public static final String CONFIGURE_STOP_EVENT = &quot;configure_stop&quot;;
+
+    public void addLifecycleListener(LifecycleListener listener);
+
+    public LifecycleListener[] findLifecycleListeners();
+
+    public void removeLifecycleListener(LifecycleListener listener);
+
+    public void init() throws LifecycleException;
+
+    public void start() throws LifecycleException;
+
+    public void stop() throws LifecycleException;
+
+    public void destroy() throws LifecycleException;
+
+    public LifecycleState getState();
+
+    public String getStateName();
+
+    public interface SingleUse {
+    }
+}
+</code></pre><p>其中，最重要的方法时start和stop方法。父组件通过这两个方法来启动/关闭该组件。addLifecycleListener，findLifecycleListeners，removeLifecycleListener三个方法用于向组件注册/查找/删除监听器。当事件发生时，会触发监听器。接口中还定义了相关事件。</p>
+<p>下面从一幅图来了解Tomcat涉及生命周期管理的主要类：</p>
+<p><img src="http://i.imgur.com/ZIi07NG.jpg" alt=""></p>
+<ul>
+<li>Lifecycle：定义了容器生命周期、容器状态转换及容器状态迁移事件的监听器注册和移除等主要接口；</li>
+<li>LifecycleBase：作为Lifecycle接口的抽象实现类，运用抽象模板模式将所有容器的生命周期及状态转换衔接起来，此外还提供了生成LifecycleEvent事件的接口；</li>
+<li>LifecycleSupport：提供有关LifecycleEvent事件的监听器注册、移除，并且使用经典的监听器模式，实现事件生成后触打监听器的实现；</li>
+<li>MBeanRegistration：Java jmx框架提供的注册MBean的接口，引入此接口是为了便于使用JMX提供的管理功能；</li>
+<li>LifecycleMBeanBase：Tomcat提供的对MBeanRegistration的抽象实现类，运用抽象模板模式将所有容器统一注册到JMX；</li>
+</ul>
+<p>从上图可以看出ContainerBase、StandardServer、StandardService、WebappLoader、Connector、StandardContext、StandardEngine、StandardHost、StandardWrapper等容器都继承了LifecycleMBeanBase，因此这些容器都具有了同样的生命周期并可以通过JMX进行管理。</p>
+<h2 id="什么是JMX"><a href="#什么是JMX" class="headerlink" title="什么是JMX?"></a>什么是JMX?</h2><p>JMX（Java Management Extensions，即Java管理扩展）是一个为应用程序、设备、系统等植入管理功能的框架。JMX可以跨越一系列异构操作系统平台、系统体系结构和网络传输协议，灵活的开发无缝集成的系统、网络和服务管理应用。</p>
+<p><img src="http://i.imgur.com/nHRPZr2.jpg" alt=""></p>
+<p>JMX体系结构分为以下四个层次：</p>
+<p><strong>设备层</strong></p>
+<p>设备层（Instrumentation Level）：主要定义了信息模型。在JMX中，各种管理对象以管理构件的形式存在，需要管理时，向MBean服务器进行注册。该层还定义了通知机制以及一些辅助元数据类。</p>
+<p><strong>代理层</strong></p>
+<p>代理层（Agent Level）：主要定义了各种服务以及通信模型。该层的核心是一个MBean服务器，所有的管理构件都需要向它注册，才能被管理。注册在MBean服务器上管理构件并不直接和远程应用程序进行通信，它们通过协议适配器和连接器进行通信。而协议适配器和连接器也以管理构件的形式向MBean服务器注册才能提供相应的服务。</p>
+<p><strong>分布服务层</strong></p>
+<p>分布服务层（Distributed Service Level）：主要定义了能对代理层进行操作的管理接口和构件，这样管理者就可以操作代理。然而，当前的JMX规范并没有给出这一层的具体规范。</p>
+<p><strong>附加管理协议API</strong></p>
+<p>定义的API主要用来支持当前已经存在的网络管理协议，如SNMP、TMN、CIM/WBEM等。</p>
+<h2 id="Tomcat–事件、监听"><a href="#Tomcat–事件、监听" class="headerlink" title="Tomcat–事件、监听"></a>Tomcat–事件、监听</h2><p>每个容器由于继承自LifecycleBase，当容器状态发生变化时，都会调用fireLifecycleEvent方法，生成LifecycleEvent，并且交由此容器的事件监听器处理。</p>
+<p>LifecycleBase的fireLifecycleEvent方法的实现：</p>
+<pre><code> protected void fireLifecycleEvent(String type, Object data) {
+    lifecycle.fireLifecycleEvent(type, data);
+}
+
+
+//lifecycle定义
+private LifecycleSupport lifecycle = new LifecycleSupport(this);
+
+
+//LifecycleSupport的fireLifecycleEvent方法的实现
+  public void fireLifecycleEvent(String type, Object data) {
+    LifecycleEvent event = new LifecycleEvent(lifecycle, type, data);
+    LifecycleListener interested[] = listeners;
+    for (int i = 0; i &lt; interested.length; i++)
+        interested[i].lifecycleEvent(event);
+
+}
+</code></pre><p>然后将事件通知给所有监听当前容器的生命周期监听器LifecycleListener，并调用LifecycleListener的lifecycleEvent方法。</p>
+<p>那么监听器LifecycleListener是何时注册进来的？其实每个容器在新建、初始化、启动，销毁，被添加到父容器的过程中都会调用父类LifecycleBase的addLifecycleListener方法：</p>
+<pre><code> public void addLifecycleListener(LifecycleListener listener) {
+    lifecycle.addLifecycleListener(listener);
+}
+</code></pre><p>LifecycleBase的addLifecycleListener方法实际是对LifecycleSupport的addLifecycleListener方法的简单代理，LifecycleSupport的addLifecycleListener方法的实现：</p>
+<pre><code>public void addLifecycleListener(LifecycleListener listener) {
+
+  synchronized (listenersLock) {
+      LifecycleListener results[] =
+        new LifecycleListener[listeners.length + 1];
+      for (int i = 0; i &lt; listeners.length; i++)
+          results[i] = listeners[i];
+      results[listeners.length] = listener;
+      listeners = results;
+  }
+
+}
+</code></pre><p>容器会最终调用每个对此容器感兴趣的LifecycleListener的lifecycleEvent方法，那么LifecycleListener的lifecycleEvent方法会做些什么呢？为了简单起见，我们以监听器JasperListener为例，JasperListener的lifecycleEvent方法的实现：</p>
+<pre><code>  public void lifecycleEvent(LifecycleEvent event) {
+
+    if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
+        try {
+            // Set JSP factory
+            Class.forName(&quot;org.apache.jasper.compiler.JspRuntimeContext&quot;,
+                          true,
+                          this.getClass().getClassLoader());
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            // Should not occur, obviously
+            log.warn(&quot;Couldn&apos;t initialize Jasper&quot;, t);
+        }
+        // Another possibility is to do directly:
+        // JspFactory.setDefaultFactory(new JspFactoryImpl());
+    }
+
+}
+</code></pre><h2 id="Tomcat–容器生命周期"><a href="#Tomcat–容器生命周期" class="headerlink" title="Tomcat–容器生命周期"></a>Tomcat–容器生命周期</h2><p>StandardServer、StandardService、Connector、StandardContext这些容器，彼此之间都有父子关系，每个容器都可能包含零个或者多个子容器，这些子容器可能存在不同类型或者相同类型的多个。在一个容器创建成功后，会有以下状态：</p>
+<ul>
+<li><p>NEW：容器刚刚创建时，即在LifecycleBase实例构造完成时的状态。</p>
+</li>
+<li><p>INITIALIZED：容器初始化完成时的状态。</p>
+</li>
+<li><p>STARTING_PREP：容器启动前的状态。</p>
+</li>
+<li><p>STARTING：容器启动过程中的状态。</p>
+</li>
+<li><p>STARTED：容器启动完成的状态。</p>
+</li>
+<li><p>STOPPING_PREP：容器停止前的状态。</p>
+</li>
+<li><p>STOPPING：容器停止过程中的状态。</p>
+</li>
+<li><p>STOPPED：容器停止完成的状态。</p>
+</li>
+<li><p>DESTROYED：容器销毁后的状态。</p>
+</li>
+<li><p>FAILED：容器启动、停止过程中出现异常的状态。</p>
+</li>
+<li><p>MUST_STOP：此状态未使用。</p>
+</li>
+<li><p>MUST_DESTROY：此状态未使用。</p>
+</li>
+</ul>
+<p>这些状态都定义在枚举类LifecycleState中。代码详单：</p>
+<pre><code>public enum LifecycleState {
+    NEW(false, null),
+    INITIALIZING(false, Lifecycle.BEFORE_INIT_EVENT),
+    INITIALIZED(false, Lifecycle.AFTER_INIT_EVENT),
+    STARTING_PREP(false, Lifecycle.BEFORE_START_EVENT),
+    STARTING(true, Lifecycle.START_EVENT),
+    STARTED(true, Lifecycle.AFTER_START_EVENT),
+    STOPPING_PREP(true, Lifecycle.BEFORE_STOP_EVENT),
+    STOPPING(false, Lifecycle.STOP_EVENT),
+    STOPPED(false, Lifecycle.AFTER_STOP_EVENT),
+    DESTROYING(false, Lifecycle.BEFORE_DESTROY_EVENT),
+    DESTROYED(false, Lifecycle.AFTER_DESTROY_EVENT),
+    FAILED(false, null),
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 9.0.x. The state transition
+     *             checking in {@link org.apache.catalina.util.LifecycleBase}
+     *             makes it impossible to use this state. The intended behaviour
+     *             can be obtained by setting the state to
+     *             {@link LifecycleState#FAILED} in
+     *             &lt;code&gt;LifecycleBase.startInternal()&lt;/code&gt;
+     */
+    @Deprecated
+    MUST_STOP(true, null),
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 9.0.x. The state transition
+     *             checking in {@link org.apache.catalina.util.LifecycleBase}
+     *             makes it impossible to use this state. The intended behaviour
+     *             can be obtained by implementing {@link Lifecycle.SingleUse}.
+     */
+    @Deprecated
+    MUST_DESTROY(false, null);
+
+    private final boolean available;
+    private final String lifecycleEvent;
+
+    private LifecycleState(boolean available, String lifecycleEvent) {
+        this.available = available;
+        this.lifecycleEvent = lifecycleEvent;
+    }
+
+    /**
+     * May the public methods other than property getters/setters and lifecycle
+     * methods be called for a component in this state? It returns
+     * &lt;code&gt;true&lt;/code&gt; for any component in any of the following states:
+     * &lt;ul&gt;
+     * &lt;li&gt;{@link #STARTING}&lt;/li&gt;
+     * &lt;li&gt;{@link #STARTED}&lt;/li&gt;
+     * &lt;li&gt;{@link #STOPPING_PREP}&lt;/li&gt;
+     * &lt;li&gt;{@link #MUST_STOP}&lt;/li&gt;
+     * &lt;/ul&gt;
+     */
+    public boolean isAvailable() {
+        return available;
+    }
+
+    /**
+     *
+     */
+    public String getLifecycleEvent() {
+        return lifecycleEvent;
+    }
+}
+</code></pre><p>每个容器都会有自身的生命周期，其中也涉及状态的迁移，以及伴随的事件生成。所有容器的状态转换（如新建、初始化、启动、停止等）都是由外到内，由上到下进行，即先执行父容器的状态转换及相关操作，然后再执行子容器的转态转换，这个过程是层层迭代执行的。</p>
+<h3 id="Tomcat容器生命周期—-新建"><a href="#Tomcat容器生命周期—-新建" class="headerlink" title="Tomcat容器生命周期—-新建"></a>Tomcat容器生命周期—-新建</h3><p>所有容器在构造的过程中，都会首先对父类LifecycleBase进行构造。LifecycleBase中定义了所有容器的起始状态为LifecycleState.NEW。</p>
+<pre><code>private volatile LifecycleState state = LifecycleState.NEW;
+</code></pre><h3 id="Tomcat容器生命周期—-初始化"><a href="#Tomcat容器生命周期—-初始化" class="headerlink" title="Tomcat容器生命周期—-初始化"></a>Tomcat容器生命周期—-初始化</h3><p>每个容器的init方法是自身初始化的入口，其初始化过程如图所示：</p>
+<p><img src="http://i.imgur.com/qSZYYc3.jpg" alt=""></p>
+<ol>
+<li>调用方调用容器父类LifecycleBase的init方法，LifecycleBase的init方法主要完成一些所有容器公共抽象出来的动作；</li>
+<li>LifecycleBase的init方法调用具体容器的initInternal方法实现，此initInternal方法用于对容器本身真正的初始化；</li>
+<li>具体容器的initInternal方法调用父类LifecycleMBeanBase的initInternal方法实现，此initInternal方法用于将容器托管到JMX，便于运维管理；</li>
+<li>LifecycleMBeanBase的initInternal方法调用自身的register方法，将容器作为MBean注册到MBeanServer；</li>
+<li>容器如果有子容器，会调用子容器的init方法；</li>
+<li>容器初始化完毕，LifecycleBase会将容器的状态更改为初始化完毕，即LifecycleState.INITIALIZED。</li>
+</ol>
+<pre><code>**init方法的实现**
+
+     public final synchronized void init() throws LifecycleException {
+    if (!state.equals(LifecycleState.NEW)) {
+        invalidTransition(Lifecycle.BEFORE_INIT_EVENT);
+    }
+    setStateInternal(LifecycleState.INITIALIZING, null, false);
+
+    try {
+        initInternal();//调用具体容器的initInternal方法实现
+    } catch (Throwable t) {
+        ExceptionUtils.handleThrowable(t);
+        setStateInternal(LifecycleState.FAILED, null, false);
+        throw new LifecycleException(
+                sm.getString(&quot;lifecycleBase.initFail&quot;,toString()), t);
+    }
+
+    setStateInternal(LifecycleState.INITIALIZED, null, false);
+        }
+</code></pre><p>只有当前容器的状态处于LifecycleState.NEW的才可以被初始化，真正执行初始化的方法是initInternal，当初始化完毕，当前容器的状态会被更改为LifecycleState.INITIALIZED。以StandardService这个容器为例举例分析，StandardService容器的initInternal方法实现：</p>
+<pre><code>  protected void initInternal() throws LifecycleException {
+
+    super.initInternal();
+
+    if (container != null) {
+        container.init();
+    }
+
+    // Initialize any Executors
+    for (Executor executor : findExecutors()) {
+        if (executor instanceof LifecycleMBeanBase) {
+            ((LifecycleMBeanBase) executor).setDomain(getDomain());
+        }
+        executor.init();
+    }
+
+    // Initialize our defined Connectors
+    synchronized (connectorsLock) {
+        for (Connector connector : connectors) {
+            try {
+                connector.init();
+            } catch (Exception e) {
+                String message = sm.getString(
+                        &quot;standardService.connector.initFailed&quot;, connector);
+                log.error(message, e);
+
+                if (Boolean.getBoolean(&quot;org.apache.catalina.startup.EXIT_ON_INIT_FAILURE&quot;))
+                    throw new LifecycleException(message);
+            }
+        }
+    }
+}
+</code></pre><p>其处理过程：</p>
+<p><strong><em>a、调用父类LifecycleBase的initInternal方法，为当前容器创建DynamicMBean，并注册到JMX中。</em></strong></p>
+<pre><code>protected void initInternal() throws LifecycleException {
+
+    // If oname is not null then registration has already happened via
+    // preRegister().
+    if (oname == null) {
+        mserver = Registry.getRegistry(null, null).getMBeanServer();
+
+        oname = register(this, getObjectNameKeyProperties());
+    }
+}
+
+//getObjectNameKeyProperties()方法
+public final String getObjectNameKeyProperties() {
+    return &quot;type=Service&quot;;
+}
+</code></pre><p>LifecycleBase的register方法会为当前容器创建对应的注册名称，以StandardService为例，getDomain默认返回Catalina，因此StandardService的JMX注册名称默认为Catalina:type=Service，真正的注册在registerComponent方法中实现。</p>
+<pre><code>//register方法
+protected final ObjectName register(Object obj,
+        String objectNameKeyProperties) {
+
+    // Construct an object name with the right domain
+    StringBuilder name = new StringBuilder(getDomain());
+    name.append(&apos;:&apos;);
+    name.append(objectNameKeyProperties);
+
+    ObjectName on = null;
+
+    try {
+        on = new ObjectName(name.toString());
+
+        Registry.getRegistry(null, null).registerComponent(obj, on, null);
+    } catch (MalformedObjectNameException e) {
+        log.warn(sm.getString(&quot;lifecycleMBeanBase.registerFail&quot;, obj, name),
+                e);
+    } catch (Exception e) {
+        log.warn(sm.getString(&quot;lifecycleMBeanBase.registerFail&quot;, obj, name),
+                e);
+    }
+
+    return on;
+}
+
+//registerComponent方法
+public void registerComponent(Object bean, ObjectName oname, String type)
+       throws Exception
+{
+    if( log.isDebugEnabled() ) {
+        log.debug( &quot;Managed= &quot;+ oname);
+    }
+
+    if( bean ==null ) {
+        log.error(&quot;Null component &quot; + oname );
+        return;
+    }
+
+    try {
+        if( type==null ) {
+            type=bean.getClass().getName();
+        }
+
+        ManagedBean managed = findManagedBean(bean.getClass(), type);
+
+        // The real mbean is created and registered
+        DynamicMBean mbean = managed.createMBean(bean);
+
+        if(  getMBeanServer().isRegistered( oname )) {
+            if( log.isDebugEnabled()) {
+                log.debug(&quot;Unregistering existing component &quot; + oname );
+            }
+            getMBeanServer().unregisterMBean( oname );
+        }
+
+        getMBeanServer().registerMBean( mbean, oname);
+    } catch( Exception ex) {
+        log.error(&quot;Error registering &quot; + oname, ex );
+        throw ex;
+    }
+}
+</code></pre><p>Registry的registerComponent方法会为当前容器（如StandardService）创建DynamicMBean，并且注册到MBeanServer中。</p>
+<p><strong><em>b、将StringCache、MBeanFactory、globalNamingResources注册到JMX</em></strong></p>
+<p>其中StringCache的注册名为Catalina:type=StringCache，MBeanFactory的注册名为Catalina:type=MBeanFactory，globalNamingResources的注册名为Catalina:type=NamingResources（如StandardService则为：Catalina:type=Service）</p>
+<p><strong><em>c、初始化子容器</em></strong></p>
+<p>主要对Service子容器进行初始化，默认是StandardService。</p>
+<p>注意：个别容器并不完全遵循以上的初始化过程，比如ProtocolHandler作为Connector的子容器，其初始化过程并不是由Connector的initInternal方法调用的，而是与启动过程一道被Connector的startInternal方法所调用。</p>
+<h3 id="Tomcat容器生命周期—-容器启动"><a href="#Tomcat容器生命周期—-容器启动" class="headerlink" title="Tomcat容器生命周期—-容器启动"></a>Tomcat容器生命周期—-容器启动</h3><p>每个容器的start方法是自身启动的入口</p>
+<p><img src="http://i.imgur.com/tKjahP2.jpg" alt=""></p>
+<ol>
+<li>调用方调用容器父类LifecycleBase的start方法，LifecycleBase的start方法主要完成一些所有容器公共抽象出来的动作；</li>
+<li>LifecycleBase的start方法先将容器状态改为LifecycleState.STARTING_PREP，然后调用具体容器的startInternal方法实现，此startInternal方法用于对容器本身真正的初始化；</li>
+<li>具体容器的startInternal方法会将容器状态改为LifecycleState.STARTING，容器如果有子容器，会调用子容器的start方法启动子容器；</li>
+<li><p>容器启动完毕，LifecycleBase会将容器的状态更改为启动完毕，即LifecycleState.STARTED。</p>
+<pre><code>//LifecycleBase的start方法
+public final synchronized void start() throws LifecycleException {
+
+    if (LifecycleState.STARTING_PREP.equals(state) || LifecycleState.STARTING.equals(state) ||
+            LifecycleState.STARTED.equals(state)) {
+
+        if (log.isDebugEnabled()) {
+            Exception e = new LifecycleException();
+            log.debug(sm.getString(&quot;lifecycleBase.alreadyStarted&quot;, toString()), e);
+        } else if (log.isInfoEnabled()) {
+            log.info(sm.getString(&quot;lifecycleBase.alreadyStarted&quot;, toString()));
+        }
+
+        return;
+    }
+
+    if (state.equals(LifecycleState.NEW)) {
+        init();
+    } else if (state.equals(LifecycleState.FAILED)) {
+        stop();
+    } else if (!state.equals(LifecycleState.INITIALIZED) &amp;&amp;
+            !state.equals(LifecycleState.STOPPED)) {
+        invalidTransition(Lifecycle.BEFORE_START_EVENT);
+    }
+
+    setStateInternal(LifecycleState.STARTING_PREP, null, false);
+
+    try {
+        startInternal();
+    } catch (Throwable t) {
+        // This is an &apos;uncontrolled&apos; failure so put the component into the
+        // FAILED state and throw an exception.
+        ExceptionUtils.handleThrowable(t);
+        setStateInternal(LifecycleState.FAILED, null, false);
+        throw new LifecycleException(sm.getString(&quot;lifecycleBase.startFail&quot;, toString()), t);
+    }
+
+    if (state.equals(LifecycleState.FAILED)) {
+        // This is a &apos;controlled&apos; failure. The component put itself into the
+        // FAILED state so call stop() to complete the clean-up.
+        stop();
+    } else if (!state.equals(LifecycleState.STARTING)) {
+        // Shouldn&apos;t be necessary but acts as a check that sub-classes are
+        // doing what they are supposed to.
+        invalidTransition(Lifecycle.AFTER_START_EVENT);
+    } else {
+        setStateInternal(LifecycleState.STARTED, null, false);
+    }
+}
+</code></pre></li>
+</ol>
+<p>在真正启动容器之前需要做2种检查：</p>
+<p>如果当前容器已经处于启动过程（即容器状态为LifecycleState.STARTING_PREP、LifecycleState.STARTING、LifecycleState.STARTED）中，则会产生并且用日志记录LifecycleException异常并退出。<br>如果容器依然处于LifecycleState.NEW状态，则在启动之前，首先确保初始化完毕。</p>
+<p>启动容器完毕后，需要做1种检查:<br>即如果容器启动异常导致容器进入LifecycleState.FAILED或者LifecycleState.MUST_STOP状态，则需要调用stop方法停止容器。</p>
+<p>以StandardService为例，其startInternal的实现:</p>
+<pre><code>protected void startInternal() throws LifecycleException {
+
+    if(log.isInfoEnabled())
+        log.info(sm.getString(&quot;standardService.start.name&quot;, this.name));
+    setState(LifecycleState.STARTING);//将自身状态更改为LifecycleState.STARTING；
+
+    // Start our defined Container first
+    if (container != null) {
+        synchronized (container) {
+            container.start();//调用子容器Service的start方法启动子容器。
+        }
+    }
+
+    synchronized (executors) {
+        for (Executor executor: executors) {
+            executor.start();
+        }
+    }
+
+    // Start our defined Connectors second
+    synchronized (connectorsLock) {
+        for (Connector connector: connectors) {
+            try {
+                // If it has already failed, don&apos;t try and start it
+                if (connector.getState() != LifecycleState.FAILED) {
+                    connector.start();
+                }
+            } catch (Exception e) {
+                log.error(sm.getString(
+                        &quot;standardService.connector.startFailed&quot;,
+                        connector), e);
+            }
+        }
+    }
+}
+</code></pre><p>除了初始化、启动外，各个容器还有停止和销毁的生命周期，其原理与初始化、启动类似。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Tomcat通过将内部所有组件都抽象为容器，为容器提供统一的生命周期管理，各个子容器只需要关心各自的具体实现，这便于Tomcat以后扩展更多的容器。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://zhengweishan.oschina.io/2017/03/01/（六）Tomcat_7.0.70生命周期管理/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://zhengweishan.oschina.io/2017/03/01/（六）Tomcat_7.0.70生命周期管理/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/03/01/（三）Tomcat_7.0.70停止分析/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    (no title)
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/03/01/（二）Tomcat_7.0.70启动分析/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title"></div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2017/03/01/（六）Tomcat_7.0.70生命周期管理/" data-title="" data-url="http://zhengweishan.oschina.io/2017/03/01/（六）Tomcat_7.0.70生命周期管理/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习（四）---- Kafka整合SpringMVC实例（二）/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习（四）---- Kafka整合SpringMVC实例（二）/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.035Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习(一) ---- 基本概念以及环境搭建/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习(一) ---- 基本概念以及环境搭建/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.035Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习（三）---- Kafka整合SpringMVC实例/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习（三）---- Kafka整合SpringMVC实例/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.034Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.026Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/JMS学习（四）Spring和ActiveMQ整合的完整实例/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/JMS学习（四）Spring和ActiveMQ整合的完整实例/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.025Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Elasticsearch/">Elasticsearch</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JMS/">JMS</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JVM/">JVM</a><span class="category-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/ActiveMQ/" style="font-size: 10px;">ActiveMQ</a> <a href="/tags/Elasticsearch学习/" style="font-size: 15px;">Elasticsearch学习</a> <a href="/tags/GC/" style="font-size: 15px;">GC</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/JAVA/" style="font-size: 20px;">JAVA</a> <a href="/tags/JMS/" style="font-size: 10px;">JMS</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Reflection/" style="font-size: 10px;">Reflection</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2017 郑伟山 版权所有<br> 
+            由 <a href="http://hexo.io/" target="_blank">Hexo</a> 强力驱动 &brvbar; 主题 -- <a href="https://github.com/ppoffice/hexo-theme-icarus">Icarus</a><br>
+            
+        </div>
+		<div class="inner">
+        	<span id="busuanzi_container_site_pv">
+    			本站总访问量<span id="busuanzi_value_site_pv" class="foot-count"></span>次
+			</span> &brvbar;
+			<span id="busuanzi_container_site_uv">
+  				您是本站第<span id="busuanzi_value_site_uv" class="foot-count"></span>位访客
+			</span>
+		</div>
+    </div>
+</footer>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'wesley-icarus'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

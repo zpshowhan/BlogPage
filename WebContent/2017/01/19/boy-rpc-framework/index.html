@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta name="baidu-site-verification" content="lKl7jYajUz" />
+    <meta charset="utf-8">
+    
+    <title>分布式rpc框架 | 迷失的男孩</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="keywords" content="火龙战士,zhengweishan,郑伟山的博客，bolg,博客">
+    <meta name="description" content="什么是RPCRPC（Remote Procedure Call Protocol）——远程过程调用协议，它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。说得通俗一点就是：调用远程计算机上的服务，就像调用本地服务一样。它可以有不同的实现方式:如RMI(远程方法调用)、Hessian、Http invoker等。另外，RPC是与语言无关的。
+RPC示意图（来源网络）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式rpc框架">
+<meta property="og:url" content="http://zhengweishan.oschina.io/2017/01/19/boy-rpc-framework/index.html">
+<meta property="og:site_name" content="迷失的男孩">
+<meta property="og:description" content="什么是RPCRPC（Remote Procedure Call Protocol）——远程过程调用协议，它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。说得通俗一点就是：调用远程计算机上的服务，就像调用本地服务一样。它可以有不同的实现方式:如RMI(远程方法调用)、Hessian、Http invoker等。另外，RPC是与语言无关的。
+RPC示意图（来源网络）">
+<meta property="og:image" content="http://i.imgur.com/NxofKwx.png">
+<meta property="og:image" content="http://i.imgur.com/QeMu3tX.png">
+<meta property="og:image" content="http://i.imgur.com/2Oj5TyE.png">
+<meta property="og:image" content="http://i.imgur.com/DkGd4Cy.png">
+<meta property="og:image" content="http://i.imgur.com/g1txCNQ.png">
+<meta property="og:updated_time" content="2017-03-23T02:34:15.830Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="分布式rpc框架">
+<meta name="twitter:description" content="什么是RPCRPC（Remote Procedure Call Protocol）——远程过程调用协议，它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。说得通俗一点就是：调用远程计算机上的服务，就像调用本地服务一样。它可以有不同的实现方式:如RMI(远程方法调用)、Hessian、Http invoker等。另外，RPC是与语言无关的。
+RPC示意图（来源网络）">
+<meta name="twitter:image" content="http://i.imgur.com/NxofKwx.png">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="迷失的男孩" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/favicon.ico" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?eb23f1849f20e62c924d275e4edef134";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">迷失的男孩</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpg" />
+            <h2 id="name">迷失的男孩</h2>
+            <h3 id="title">为API生，为框架死，为debug奋斗一辈子，吃符号亏，上大小写的当，最后死在需求上。</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>中国, 北京</span>
+            <a id="follow" target="_blank" href="https://github.com/wesley5201314">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                23
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                11
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/wesley5201314" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://git.oschina.net/zhengweishan" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/css/images/weixin.png" target="_blank" title="weixin" class=tooltip>
+                            <i class="fa fa-weixin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="http://weibo.com/wesley5201314" target="_blank" title="weibo" class=tooltip>
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-boy-rpc-framework" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            分布式rpc框架
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/01/19/boy-rpc-framework/">
+            <time datetime="2017-01-18T16:00:00.000Z" itemprop="datePublished">2017-01-19</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/rpc/">rpc</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/rpc-分布式/">rpc 分布式</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h2 id="什么是RPC"><a href="#什么是RPC" class="headerlink" title="什么是RPC"></a>什么是RPC</h2><p>RPC（Remote Procedure Call Protocol）——远程过程调用协议，它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。说得通俗一点就是：调用远程计算机上的服务，就像调用本地服务一样。它可以有不同的实现方式:如RMI(远程方法调用)、Hessian、Http invoker等。另外，RPC是与语言无关的。</p>
+<p>RPC示意图（来源网络）<br><img src="http://i.imgur.com/NxofKwx.png" alt=""></p>
+<a id="more"></a>
+<h2 id="如何开发一个rpc框架"><a href="#如何开发一个rpc框架" class="headerlink" title="如何开发一个rpc框架"></a>如何开发一个rpc框架</h2><p>首先我们要考虑我们这个rpc框架需要具备哪些东西，比如：用什么作为底层协议，是否支持高并发，是否支持高效的序列化方式，能否同时具备服务的发现与注册。</p>
+<p>RPC 可基于 HTTP 或 TCP 协议，Web Service 就是基于 HTTP 协议的 RPC，它具有良好的跨平台性，但其性能却不如基于 TCP 协议的 RPC。会两方面会直接影响 RPC 的性能，一是传输方式，二是序列化。</p>
+<p>众所周知，TCP 是传输层协议，HTTP 是应用层协议，而传输层较应用层更加底层，在数据传输方面，越底层越快，因此，在一般情况下，TCP 一定比 HTTP 快。就序列化而言，Java 提供了默认的序列化方式，但在高并发的情况下，这种方式将会带来一些性能上的瓶颈，于是市面上出现了一系列优秀的序列化框架，比如：Protobuf、Kryo、Hessian、Jackson 等，它们可以取代 Java 默认的序列化，从而提供更高效的性能。</p>
+<p>为了支持高并发，传统的阻塞式 IO 显然不太合适，因此我们需要异步的 IO，即 NIO。Java 提供了 NIO 的解决方案，Java 7 也提供了更优秀的 NIO.2 支持，用 Java 实现 NIO 并不是遥不可及的事情，只是需要我们熟悉 NIO 的技术细节。</p>
+<p>我们需要将服务部署在分布式环境下的不同节点上，通过服务注册的方式，让客户端来自动发现当前可用的服务，并调用这些服务。这需要一种服务注册表（Service Registry）的组件，让它来注册分布式环境下所有的服务地址（包括：主机名与端口号）。</p>
+<p>应用、服务、服务注册表之间的关系见下图：</p>
+<p><img src="http://i.imgur.com/QeMu3tX.png" alt=""></p>
+<p>每台 Server 上可发布多个 Service，这些 Service 共用一个 host 与 port，在分布式环境下会提供 Server 共同对外提供 Service。此外，为防止 Service Registry 出现单点故障，因此需要将其搭建为集群环境。</p>
+<p>综合考虑，我们可以选用以下技术作为我们开发rpc框架的技术选型：</p>
+<ol>
+<li>Spring：它是最强大的依赖注入框架，也是业界的权威标准。</li>
+<li>Netty：它使 NIO 编程更加容易，屏蔽了 Java 底层的 NIO 细节。</li>
+<li>Protostuff：它基于 Protobuf 序列化框架，面向 POJO，无需编写 .proto 文件。</li>
+<li>ZooKeeper/redis：提供服务注册与发现功能，开发分布式系统的必备选择，同时它也具备天生的集群能力。</li>
+</ol>
+<h2 id="开发准备"><a href="#开发准备" class="headerlink" title="开发准备"></a>开发准备</h2><p>项目整体构思如图：</p>
+<p><img src="http://i.imgur.com/2Oj5TyE.png" alt=""></p>
+<p>各部分的作用：</p>
+<p><img src="http://i.imgur.com/DkGd4Cy.png" alt=""></p>
+<h2 id="开发流程"><a href="#开发流程" class="headerlink" title="开发流程"></a>开发流程</h2><p>开发之前我们先看下整个服务的请求流程：<br><img src="http://i.imgur.com/g1txCNQ.png" alt=""></p>
+<p>这里用redis作为注册中心，来演示一个开发过程。</p>
+<h3 id="编写服务接口："><a href="#编写服务接口：" class="headerlink" title="编写服务接口："></a>编写服务接口：</h3><pre><code>public interface HelloRedisService {
+
+    String sayHello(String str);
+}
+</code></pre><p>将该接口放在独立的客户端 jar 包中，以供应用使用。</p>
+<h3 id="编写服务接口实现类："><a href="#编写服务接口实现类：" class="headerlink" title="编写服务接口实现类："></a>编写服务接口实现类：</h3><pre><code>@BoyRpcService(HelloRedisService.class)
+public class HelloRedisServiceImpl implements HelloRedisService {
+    @Override
+    public String sayHello(String str) {
+        return &quot;redis say:&quot;+str+&quot;,Hello!&quot;;
+    }
+}
+</code></pre><p>BoyRpcService注解定义在服务接口的实现类上，需要对该实现类指定远程接口，因为实现类可能会实现多个接口，一定要告诉框架哪个才是远程接口。</p>
+<pre><code>@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Component
+public @interface BoyRpcService {
+
+    /**
+     * 服务接口类
+     */
+    Class&lt;?&gt; value();
+
+    /**
+     * 服务版本号
+     */
+    String version() default &quot;&quot;;
+}
+</code></pre><p>该注解具备 Spring 的Component注解的特性，可被 Spring 扫描。</p>
+<p>该实现类放在服务端 jar 包中，该 jar 包还提供了一些服务端的配置文件与启动服务的引导程序。</p>
+<h3 id="配置服务端："><a href="#配置服务端：" class="headerlink" title="配置服务端："></a>配置服务端：</h3><p>服务端 Spring 配置文件名为spring-by-redis.xml，内容如下：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
+
+    &lt;context:component-scan base-package=&quot;com.boy.rpc.framework.sample.server&quot;/&gt;
+
+    &lt;context:property-placeholder location=&quot;classpath:rpc-redis.properties&quot;/&gt;
+
+    &lt;bean id=&quot;redisConfig&quot; class=&quot;com.boy.rpc.framework.registry.redis.bean.RedisConfig&quot;&gt;
+        &lt;property name=&quot;redisAddress&quot; value=&quot;${rpc.registry_address}&quot;/&gt;
+        &lt;property name=&quot;redisPassword&quot; value=&quot;${rpc.registry_password}&quot;/&gt;
+        &lt;property name=&quot;redisPort&quot; value=&quot;${rpc.registry_port}&quot;/&gt;
+    &lt;/bean&gt;
+
+    &lt;bean id=&quot;serviceRegistry&quot; class=&quot;com.boy.rpc.framework.registry.redis.RedisServiceRegistry&quot;&gt;
+        &lt;constructor-arg name=&quot;redisConfig&quot; ref =&quot;redisConfig&quot;/&gt;
+    &lt;/bean&gt;
+
+    &lt;bean id=&quot;rpcServer&quot; class=&quot;com.boy.rpc.framework.server.BoyRpcServer&quot;&gt;
+        &lt;constructor-arg name=&quot;serviceAddress&quot; value=&quot;${rpc.redis_service_address}&quot;/&gt;
+        &lt;constructor-arg name=&quot;serviceRegistry&quot; ref=&quot;serviceRegistry&quot;/&gt;
+    &lt;/bean&gt;
+
+&lt;/beans&gt;
+</code></pre><p>具体的配置参数在rpc-redis.properties文件中，内容如下：</p>
+<pre><code>#服务部署地址#
+rpc.redis_service_address = 127.0.0.1:8081
+#注册中心地址#
+rpc.registry_address = 127.0.0.1
+#注册中心端口#
+rpc.registry_port = 6379
+#注册中心密码#
+rpc.registry_password = 25362e3e047b413d:Redis123
+</code></pre><p>以上配置表明：连接本地的 redis 服务器，并在 8081 端口上发布 RPC 服务。</p>
+<h2 id="启动服务器并发布服务："><a href="#启动服务器并发布服务：" class="headerlink" title="启动服务器并发布服务："></a>启动服务器并发布服务：</h2><pre><code>public class RedisRpcBootstrap {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisRpcBootstrap.class);
+
+    public static void main(String[] args) {
+        logger.debug(&quot;redis rpc start server&quot;);
+        new ClassPathXmlApplicationContext(&quot;spring-by-redis.xml&quot;);
+    }
+}
+</code></pre><h2 id="实现服务注册"><a href="#实现服务注册" class="headerlink" title="实现服务注册:"></a>实现服务注册:</h2><pre><code>public class RedisServiceRegistry implements ServiceRegistry {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisServiceRegistry.class);
+
+    private RedisClient redisClient = null;
+
+    public RedisServiceRegistry(RedisConfig redisConfig){
+        redisClient = new RedisClient(redisConfig);
+    }
+
+    @Override
+    public void register(String serviceName, String serviceAddress) {
+        logger.debug(&quot;redis register start!&quot;);
+        if(redisClient.existsKey(serviceName)){
+            List&lt;String&gt; oldList = (List&lt;String&gt;) redisClient.getObject(serviceName);
+            oldList.add(serviceAddress);
+            logger.debug(&quot;service exits create service address : {}&quot;, oldList);
+            redisClient.setObject(serviceName,oldList);
+        }else{
+            List&lt;String&gt; addressList = new ArrayList&lt;&gt;();
+            addressList.add(serviceAddress);
+            logger.debug(&quot;service not exits create service address : {}&quot;, addressList);
+            redisClient.setObject(serviceName,addressList);
+        }
+        logger.debug(&quot;redis register end!&quot;);
+    }
+
+}
+</code></pre><h2 id="实现-RPC-服务器"><a href="#实现-RPC-服务器" class="headerlink" title="实现 RPC 服务器:"></a>实现 RPC 服务器:</h2><p>使用 Netty 可实现一个支持 NIO 的 RPC 服务器，需要使用ServiceRegistry注册服务地址，代码如下</p>
+<pre><code>public class BoyRpcServer implements ApplicationContextAware, InitializingBean {
+
+    private static final Logger logger = LoggerFactory.getLogger(BoyRpcServer.class);
+
+    private String serviceAddress;
+
+    private ServiceRegistry serviceRegistry;
+
+    /**
+     * 存放 服务名 与 服务对象 之间的映射关系
+     */
+    private Map&lt;String, Object&gt; handlerMap = new HashMap&lt;&gt;();
+
+    public BoyRpcServer(String serviceAddress) {
+        this.serviceAddress = serviceAddress;
+    }
+
+    public BoyRpcServer(String serviceAddress, ServiceRegistry serviceRegistry) {
+        this.serviceAddress = serviceAddress;
+        this.serviceRegistry = serviceRegistry;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+        // 扫描带有 RpcService 注解的类并初始化 handlerMap 对象
+        Map&lt;String, Object&gt; serviceBeanMap = ctx.getBeansWithAnnotation(BoyRpcService.class);
+        if (MapUtils.isNotEmpty(serviceBeanMap)) {
+            for (Object serviceBean : serviceBeanMap.values()) {
+                BoyRpcService rpcService = serviceBean.getClass().getAnnotation(BoyRpcService.class);
+                String serviceName = rpcService.value().getName();
+                String serviceVersion = rpcService.version();
+                if (StringUtil.isNotEmpty(serviceVersion)) {
+                    serviceName += &quot;-&quot; + serviceVersion;
+                }
+                handlerMap.put(serviceName, serviceBean);
+            }
+        }
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        try {
+            // 创建并初始化 Netty 服务端 Bootstrap 对象
+            ServerBootstrap bootstrap = new ServerBootstrap();
+            bootstrap.group(bossGroup, workerGroup);
+            bootstrap.channel(NioServerSocketChannel.class);
+            bootstrap.childHandler(new ChannelInitializer&lt;SocketChannel&gt;() {
+                @Override
+                public void initChannel(SocketChannel channel) throws Exception {
+                    ChannelPipeline pipeline = channel.pipeline();
+                    pipeline.addLast(new BoyRpcDecoder(BoyRpcRequest.class)); // 解码 RPC 请求
+                    pipeline.addLast(new BoyRpcEncoder(BoyRpcResponse.class)); // 编码 RPC 响应
+                    pipeline.addLast(new BoyRpcServerHandler(handlerMap)); // 处理 RPC 请求
+                }
+            });
+            bootstrap.option(ChannelOption.SO_BACKLOG, 1024);
+            bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
+            // 获取 RPC 服务器的 IP 地址与端口号
+            String[] addressArray = StringUtil.split(serviceAddress, &quot;:&quot;);
+            String ip = addressArray[0];
+            int port = Integer.parseInt(addressArray[1]);
+            // 启动 RPC 服务器
+            ChannelFuture future = bootstrap.bind(ip, port).sync();
+            // 注册 RPC 服务地址
+            if (serviceRegistry != null) {
+                for (String interfaceName : handlerMap.keySet()) {
+                    serviceRegistry.register(interfaceName, serviceAddress);
+                    logger.debug(&quot;register service: {} =&gt; {}&quot;, interfaceName, serviceAddress);
+                }
+            }
+            logger.debug(&quot;server started on port {}&quot;, port);
+            // 关闭 RPC 服务器
+            future.channel().closeFuture().sync();
+        } finally {
+            workerGroup.shutdownGracefully();
+            bossGroup.shutdownGracefully();
+        }
+    }
+}
+</code></pre><p>以上代码中，有两个重要的 POJO 需要描述一下，它们分别是BoyRpcRequest与BoyRpcResponse。使用RpcRequest封装 RPC 请求,使用RpcResponse封装 RPC 响应.使用BoyRpcDecoder提供 RPC 解码，只需扩展 Netty 的ByteToMessageDecoder抽象类的decode方法即可,使用BoyRpcEncoder提供 RPC 编码，只需扩展 Netty 的MessageToByteEncoder抽象类的encode方法即可.使用RpcHandler中处理 RPC 请求，只需扩展 Netty 的SimpleChannelInboundHandler抽象类即可，具体代码才看源码：</p>
+<p><a href="https://git.oschina.net/zhengweishan/boy-rpc-framework" target="_blank" rel="external">https://git.oschina.net/zhengweishan/boy-rpc-framework</a></p>
+<h2 id="配置客户端："><a href="#配置客户端：" class="headerlink" title="配置客户端："></a>配置客户端：</h2><p>同样使用 Spring 配置文件来配置 RPC 客户端，spring-by-redis.xml代码如下：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
+
+    &lt;context:property-placeholder location=&quot;classpath:rpc-redis.properties&quot;/&gt;
+
+    &lt;bean id=&quot;redisConfig&quot; class=&quot;com.boy.rpc.framework.registry.redis.bean.RedisConfig&quot;&gt;
+        &lt;property name=&quot;redisAddress&quot; value=&quot;${rpc.registry_address}&quot;/&gt;
+        &lt;property name=&quot;redisPassword&quot; value=&quot;${rpc.registry_password}&quot;/&gt;
+        &lt;property name=&quot;redisPort&quot; value=&quot;${rpc.registry_port}&quot;/&gt;
+    &lt;/bean&gt;
+
+    &lt;bean id=&quot;serviceDiscovery&quot; class=&quot;com.boy.rpc.framework.registry.redis.RedisServiceDiscovery&quot;&gt;
+        &lt;constructor-arg name=&quot;redisConfig&quot; ref=&quot;redisConfig&quot;/&gt;
+    &lt;/bean&gt;
+
+    &lt;bean id=&quot;rpcProxy&quot; class=&quot;com.boy.rpc.framework.client.BoyRpcProxy&quot;&gt;
+        &lt;constructor-arg name=&quot;serviceDiscovery&quot; ref=&quot;serviceDiscovery&quot;/&gt;
+    &lt;/bean&gt;
+
+&lt;/beans&gt;
+</code></pre><p>其中rpc-redis.properties提供了具体的配置：</p>
+<pre><code>#redis注册中心地址#
+rpc.registry_address = 127.0.0.1
+#redis注册中心端口#
+rpc.registry_port = 6379
+#redis注册中心密码#
+rpc.registry_password = 25362e3e047b413d:Redis123
+</code></pre><h2 id="实现服务发现"><a href="#实现服务发现" class="headerlink" title="实现服务发现:"></a>实现服务发现:</h2><p>同样使用 redis 实现服务发现功能，见如下代码:</p>
+<pre><code>public class RedisServiceDiscovery implements ServiceDiscovery {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisServiceRegistry.class);
+
+    private RedisClient redisClient = null;
+
+    public RedisServiceDiscovery(RedisConfig redisConfig) {
+        redisClient = new RedisClient(redisConfig);
+    }
+
+    @Override
+    public String discover(String serviceName) {
+        String address = null;
+        if(redisClient.existsKey(serviceName)){
+            List&lt;String&gt; list = (List&lt;String&gt;) redisClient.getObject(serviceName);
+            int size = list.size();
+            if(size == 1){
+                //只有一个地址
+                address = list.get(0);
+                logger.debug(&quot;get only address : {}&quot;, address);
+            } else {
+                // 若存在多个地址，则随机获取一个地址
+                address = list.get(ThreadLocalRandom.current().nextInt(size));
+                logger.debug(&quot;get random address : {}&quot;, address);
+            }
+        }
+        return address;
+    }
+}
+</code></pre><h2 id="实现-RPC-代理"><a href="#实现-RPC-代理" class="headerlink" title="实现 RPC 代理:"></a>实现 RPC 代理:</h2><p>这里使用 Java 提供的动态代理技术实现 RPC 代理（当然也可以使用 CGLib 来实现），具体代码如下：</p>
+<pre><code>public class BoyRpcProxy {
+
+    private static final Logger logger = LoggerFactory.getLogger(BoyRpcProxy.class);
+
+    private String serviceAddress;
+
+    private ServiceDiscovery serviceDiscovery;
+
+    public BoyRpcProxy(String serviceAddress) {
+        this.serviceAddress = serviceAddress;
+    }
+
+    public BoyRpcProxy(ServiceDiscovery serviceDiscovery) {
+        this.serviceDiscovery = serviceDiscovery;
+    }
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public &lt;T&gt; T create(final Class&lt;?&gt; interfaceClass) {
+        return create(interfaceClass, &quot;&quot;);
+    }
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public &lt;T&gt; T create(final Class&lt;?&gt; interfaceClass, final String serviceVersion) {
+        // 创建动态代理对象
+        return (T) Proxy.newProxyInstance(
+                interfaceClass.getClassLoader(),
+                new Class&lt;?&gt;[]{interfaceClass},
+                new InvocationHandler() {
+                    @Override
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                        // 创建 RPC 请求对象并设置请求属性
+                        BoyRpcRequest request = new BoyRpcRequest();
+                        request.setRequestId(UUID.randomUUID().toString());
+                        request.setInterfaceName(method.getDeclaringClass().getName());
+                        request.setServiceVersion(serviceVersion);
+                        request.setMethodName(method.getName());
+                        request.setParameterTypes(method.getParameterTypes());
+                        request.setParameters(args);
+                        // 获取 RPC 服务地址
+                        if (serviceDiscovery != null) {
+                            String serviceName = interfaceClass.getName();
+                            if (StringUtil.isNotEmpty(serviceVersion)) {
+                                serviceName += &quot;-&quot; + serviceVersion;
+                            }
+                            serviceAddress = serviceDiscovery.discover(serviceName);
+                            logger.debug(&quot;discover service: {} =&gt; {}&quot;, serviceName, serviceAddress);
+                        }
+                        if (StringUtil.isEmpty(serviceAddress)) {
+                            throw new RuntimeException(&quot;server address is empty&quot;);
+                        }
+                        // 从 RPC 服务地址中解析主机名与端口号
+                        String[] array = StringUtil.split(serviceAddress, &quot;:&quot;);
+                        String host = array[0];
+                        int port = Integer.parseInt(array[1]);
+                        // 创建 RPC 客户端对象并发送 RPC 请求
+                        BoyRpcClient client = new BoyRpcClient(host, port);
+                        long time = System.currentTimeMillis();
+                        BoyRpcResponse response = client.send(request);
+                        logger.debug(&quot;time: {}ms&quot;, System.currentTimeMillis() - time);
+                        if (response == null) {
+                            throw new RuntimeException(&quot;response is null&quot;);
+                        }
+                        // 返回 RPC 响应结果
+                        if (response.hasException()) {
+                            throw response.getException();
+                        } else {
+                            return response.getResult();
+                        }
+                    }
+                }
+        );
+    }
+}
+</code></pre><h2 id="发送-RPC-请求"><a href="#发送-RPC-请求" class="headerlink" title="发送 RPC 请求:"></a>发送 RPC 请求:</h2><p>使用 main 方法结合 Spring 编写一个测试，代码如下：</p>
+<pre><code>public class RedisHelloClient {
+
+    public static void main(String[] args) throws Exception {
+        ApplicationContext context = new ClassPathXmlApplicationContext(&quot;spring-by-redis.xml&quot;);
+        BoyRpcProxy rpcProxy = context.getBean(BoyRpcProxy.class);
+
+        HelloRedisService helloService = rpcProxy.create(HelloRedisService.class);
+        String result = helloService.sayHello(&quot;World&quot;);
+        System.out.println(result);
+
+        System.exit(0);
+    }
+}
+</code></pre><p>如果不出意外的话，您应该会看到：redis say:World Hello!</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文通过 Spring + Netty + Protostuff + ZooKeeper/Redis 实现了一个轻量级 RPC 框架，使用 Spring 提供依赖注入与参数配置，使用 Netty 实现 NIO 方式的数据传输，使用 Protostuff 实现对象序列化，使用 ZooKeeper/Redis 实现服务注册与发现。使用该框架，可将服务部署到分布式环境中的任意节点上，客户端通过远程接口来调用服务端的具体实现，让服务端与客户端的开发完全分离，为实现大规模分布式应用提供了基础支持。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://zhengweishan.oschina.io/2017/01/19/boy-rpc-framework/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://zhengweishan.oschina.io/2017/01/19/boy-rpc-framework/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/01/19/es1/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    Elasticsearch安装与Elasticsearch-Head插件安转(windows环境)------Elasticsearch学习（一）
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/01/19/es2/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">ElasticSearch JAVA API基础学习------Elasticsearch学习（二）</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2017/01/19/boy-rpc-framework/" data-title="分布式rpc框架" data-url="http://zhengweishan.oschina.io/2017/01/19/boy-rpc-framework/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/02/10/（六）Tomcat_7.0.70生命周期管理/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a></p>
+                            <p class="item-title"><a href="/2017/02/10/（六）Tomcat_7.0.70生命周期管理/" class="title">Tomcat源码学习（六）--Tomcat_7.0.70 生命周期管理</a></p>
+                            <p class="item-date"><time datetime="2017-02-09T16:00:00.000Z" itemprop="datePublished">2017-02-10</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/02/09/（五）Tomcat_7.0.70类加载体系/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a></p>
+                            <p class="item-title"><a href="/2017/02/09/（五）Tomcat_7.0.70类加载体系/" class="title">Tomcat源码学习（五）-- Tomcat_7.0.70 类加载体系分析</a></p>
+                            <p class="item-date"><time datetime="2017-02-08T16:00:00.000Z" itemprop="datePublished">2017-02-09</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/02/08/（四）Tomcat_7.0.70 server.xml文件的加载与解析/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a></p>
+                            <p class="item-title"><a href="/2017/02/08/（四）Tomcat_7.0.70 server.xml文件的加载与解析/" class="title">Tommcat源码学习（四）--Tomcat_7.0.70 server.xml文件的加载与解析</a></p>
+                            <p class="item-date"><time datetime="2017-02-07T16:00:00.000Z" itemprop="datePublished">2017-02-08</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/02/07/（三）Tomcat_7.0.70停止分析/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a></p>
+                            <p class="item-title"><a href="/2017/02/07/（三）Tomcat_7.0.70停止分析/" class="title">Tommcat源码学习（三）--Tomcat_7.0.70停止过程分析</a></p>
+                            <p class="item-date"><time datetime="2017-02-06T16:00:00.000Z" itemprop="datePublished">2017-02-07</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/02/06/（二）Tomcat_7.0.70启动分析/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a></p>
+                            <p class="item-title"><a href="/2017/02/06/（二）Tomcat_7.0.70启动分析/" class="title">Tomcat源码学习（二）--Tomcat_7.0.70 启动分析</a></p>
+                            <p class="item-date"><time datetime="2017-02-05T16:00:00.000Z" itemprop="datePublished">2017-02-06</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Elasticsearch/">Elasticsearch</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JMS/">JMS</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JVM/">JVM</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tomcat源码/">Tomcat源码</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/kafka/">kafka</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/rpc/">rpc</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/ActiveMQ/" style="font-size: 16.67px;">ActiveMQ</a> <a href="/tags/Elasticsearch学习/" style="font-size: 13.33px;">Elasticsearch学习</a> <a href="/tags/GC/" style="font-size: 13.33px;">GC</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/JAVA/" style="font-size: 16.67px;">JAVA</a> <a href="/tags/JMS/" style="font-size: 16.67px;">JMS</a> <a href="/tags/JVM/" style="font-size: 13.33px;">JVM</a> <a href="/tags/Reflection/" style="font-size: 10px;">Reflection</a> <a href="/tags/kafka/" style="font-size: 16.67px;">kafka</a> <a href="/tags/rpc-分布式/" style="font-size: 10px;">rpc 分布式</a> <a href="/tags/tomcat/" style="font-size: 20px;">tomcat</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2017 郑伟山 版权所有<br> 
+            由 <a href="http://hexo.io/" target="_blank">Hexo</a> 强力驱动 &brvbar; 主题 -- <a href="https://github.com/ppoffice/hexo-theme-icarus">Icarus</a><br>
+            
+        </div>
+		<div class="inner">
+        	<span id="busuanzi_container_site_pv">
+    			本站总访问量<span id="busuanzi_value_site_pv" class="foot-count"></span>次
+			</span> &brvbar;
+			<span id="busuanzi_container_site_uv">
+  				您是本站第<span id="busuanzi_value_site_uv" class="foot-count"></span>位访客
+			</span>
+		</div>
+    </div>
+</footer>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'wesley-icarus'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta name="baidu-site-verification" content="lKl7jYajUz" />
+    <meta charset="utf-8">
+    
+    <title>迷失的男孩</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="keywords" content="火龙战士,zhengweishan,郑伟山的博客，bolg,博客">
+    <meta name="description" content="Tommcat源码学习（四）–Tomcat_7.0.70 server.xml文件的加载与解析1、文件的加载Bootstrap的load方法是加载Tomcat的server.xml的入口，load方法实际通过反射调用catalinaDaemon（类型为Catalina）的load方法：
+/**
+ * Load daemon.
+ */
+private void load(String[] argum">
+<meta property="og:type" content="article">
+<meta property="og:title" content="迷失的男孩">
+<meta property="og:url" content="http://zhengweishan.oschina.io/2017/03/01/（四）Tomcat_7.0.70 server.xml文件的加载与解析/index.html">
+<meta property="og:site_name" content="迷失的男孩">
+<meta property="og:description" content="Tommcat源码学习（四）–Tomcat_7.0.70 server.xml文件的加载与解析1、文件的加载Bootstrap的load方法是加载Tomcat的server.xml的入口，load方法实际通过反射调用catalinaDaemon（类型为Catalina）的load方法：
+/**
+ * Load daemon.
+ */
+private void load(String[] argum">
+<meta property="og:image" content="http://i.imgur.com/0G69ss1.jpg">
+<meta property="og:image" content="http://i.imgur.com/5TROnzW.png">
+<meta property="og:image" content="http://i.imgur.com/AU4umDE.png">
+<meta property="og:updated_time" content="2016-07-05T10:27:12.001Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="迷失的男孩">
+<meta name="twitter:description" content="Tommcat源码学习（四）–Tomcat_7.0.70 server.xml文件的加载与解析1、文件的加载Bootstrap的load方法是加载Tomcat的server.xml的入口，load方法实际通过反射调用catalinaDaemon（类型为Catalina）的load方法：
+/**
+ * Load daemon.
+ */
+private void load(String[] argum">
+<meta name="twitter:image" content="http://i.imgur.com/0G69ss1.jpg">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="迷失的男孩" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/favicon.ico" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?eb23f1849f20e62c924d275e4edef134";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">迷失的男孩</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpg" />
+            <h2 id="name">迷失的男孩</h2>
+            <h3 id="title">为API生，为框架死，为debug奋斗一辈子，吃符号亏，上大小写的当，最后死在需求上。</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>中国, 北京</span>
+            <a id="follow" target="_blank" href="https://github.com/wesley5201314">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                22
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                8
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/wesley5201314" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://git.oschina.net/zhengweishan" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/css/images/weixin.png" target="_blank" title="weixin" class=tooltip>
+                            <i class="fa fa-weixin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="http://weibo.com/wesley5201314" target="_blank" title="weibo" class=tooltip>
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-（四）Tomcat_7.0.70 server.xml文件的加载与解析" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h1 id="Tommcat源码学习（四）–Tomcat-7-0-70-server-xml文件的加载与解析"><a href="#Tommcat源码学习（四）–Tomcat-7-0-70-server-xml文件的加载与解析" class="headerlink" title="Tommcat源码学习（四）–Tomcat_7.0.70 server.xml文件的加载与解析"></a>Tommcat源码学习（四）–Tomcat_7.0.70 server.xml文件的加载与解析</h1><h1 id="1、文件的加载"><a href="#1、文件的加载" class="headerlink" title="1、文件的加载"></a>1、文件的加载</h1><p>Bootstrap的load方法是加载Tomcat的server.xml的入口，load方法实际通过反射调用catalinaDaemon（类型为Catalina）的load方法：</p>
+<pre><code>/**
+ * Load daemon.
+ */
+private void load(String[] arguments)
+    throws Exception {
+
+    // Call the load() method
+    String methodName = &quot;load&quot;;
+    Object param[];
+    Class&lt;?&gt; paramTypes[];
+    if (arguments==null || arguments.length==0) {
+        paramTypes = null;
+        param = null;
+    } else {
+        paramTypes = new Class[1];
+        paramTypes[0] = arguments.getClass();
+        param = new Object[1];
+        param[0] = arguments;
+    }
+    Method method =
+        catalinaDaemon.getClass().getMethod(methodName, paramTypes);//通过反射机制调用Catalina类的load方法。
+    if (log.isDebugEnabled())
+        log.debug(&quot;Calling startup class &quot; + method);
+    method.invoke(catalinaDaemon, param);
+
+}
+</code></pre><p>Catalina类的load方法：</p>
+<pre><code> /*
+ * Load using arguments
+ */
+public void load(String args[]) {
+
+    try {
+        if (arguments(args)) {
+            load();//调用自身的load方法
+        }
+    } catch (Exception e) {
+        e.printStackTrace(System.out);
+    }
+}
+
+ /**
+ * Start a new server instance.
+ */
+public void load() {
+
+    long t1 = System.nanoTime();
+
+    initDirs(); //用于对catalina.home和catalina.base的一些检查工作
+
+    // Before digester - it may be needed
+
+    initNaming();//给系统设置java.naming.factory.url.pkgs和java.naming.factory.initial
+
+    // Create and execute our Digester
+    Digester digester = createStartDigester();//实例化Digester
+
+    InputSource inputSource = null;
+    InputStream inputStream = null;
+    File file = null;
+    try {
+        try {
+            file = configFile();//获取conf/server.xml配置文件
+            inputStream = new FileInputStream(file);获取conf/server.xml配置文件输入流
+            inputSource = new InputSource(file.toURI().toURL().toString());
+        } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString(&quot;catalina.configFail&quot;, file), e);
+            }
+        }
+        if (inputStream == null) {
+            try {
+                inputStream = getClass().getClassLoader()
+                    .getResourceAsStream(getConfigFile());
+                inputSource = new InputSource
+                    (getClass().getClassLoader()
+                     .getResource(getConfigFile()).toString());
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString(&quot;catalina.configFail&quot;,
+                            getConfigFile()), e);
+                }
+            }
+        }
+
+        // This should be included in catalina.jar
+        // Alternative: don&apos;t bother with xml, just create it manually.
+        if( inputStream==null ) {
+            try {
+                inputStream = getClass().getClassLoader()
+                        .getResourceAsStream(&quot;server-embed.xml&quot;);
+                inputSource = new InputSource
+                (getClass().getClassLoader()
+                        .getResource(&quot;server-embed.xml&quot;).toString());
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString(&quot;catalina.configFail&quot;,
+                            &quot;server-embed.xml&quot;), e);
+                }
+            }
+        }
+
+
+        if (inputStream == null || inputSource == null) {
+            if  (file == null) {
+                log.warn(sm.getString(&quot;catalina.configFail&quot;,
+                        getConfigFile() + &quot;] or [server-embed.xml]&quot;));
+            } else {
+                log.warn(sm.getString(&quot;catalina.configFail&quot;,
+                        file.getAbsolutePath()));
+                if (file.exists() &amp;&amp; !file.canRead()) {
+                    log.warn(&quot;Permissions incorrect, read permission is not allowed on the file.&quot;);
+                }
+            }
+            return;
+        }
+
+        try {
+            inputSource.setByteStream(inputStream);//将FileInputStream封装为InputSource
+            digester.push(this);
+            digester.parse(inputSource);//调用Digester的parse方法进行解析
+        } catch (SAXParseException spe) {
+            log.warn(&quot;Catalina.start using &quot; + getConfigFile() + &quot;: &quot; +
+                    spe.getMessage());
+            return;
+        } catch (Exception e) {
+            log.warn(&quot;Catalina.start using &quot; + getConfigFile() + &quot;: &quot; , e);
+            return;
+        }
+    } finally {
+        if (inputStream != null) {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                // Ignore
+            }
+        }
+    }
+
+    getServer().setCatalina(this);
+
+    // Stream redirection
+    initStreams();//initStreams对输出流、错误流重定向
+
+    // Start the new server
+    try {
+        getServer().init();//初始化server
+    } catch (LifecycleException e) {
+        if (Boolean.getBoolean(&quot;org.apache.catalina.startup.EXIT_ON_INIT_FAILURE&quot;)) {
+            throw new java.lang.Error(e);
+        } else {
+            log.error(&quot;Catalina.start&quot;, e);
+        }
+
+    }
+
+    long t2 = System.nanoTime();
+    if(log.isInfoEnabled()) {
+        log.info(&quot;Initialization processed in &quot; + ((t2 - t1) / 1000000) + &quot; ms&quot;);
+    }
+
+}
+</code></pre><p>下面开始分析整个过程：</p>
+<h2 id="1-1、initDirs（）方法用于对catalina-home和catalina-base的一些检查工作"><a href="#1-1、initDirs（）方法用于对catalina-home和catalina-base的一些检查工作" class="headerlink" title="1.1、initDirs（）方法用于对catalina.home和catalina.base的一些检查工作"></a>1.1、initDirs（）方法用于对catalina.home和catalina.base的一些检查工作</h2><pre><code>protected void initDirs() {
+
+    String catalinaHome = System.getProperty(Globals.CATALINA_HOME_PROP);
+    if (catalinaHome == null) {
+        // Backwards compatibility patch for J2EE RI 1.3
+        String j2eeHome = System.getProperty(&quot;com.sun.enterprise.home&quot;);
+        if (j2eeHome != null) {
+            catalinaHome=System.getProperty(&quot;com.sun.enterprise.home&quot;);
+        } else if (System.getProperty(Globals.CATALINA_BASE_PROP) != null) {
+            catalinaHome = System.getProperty(Globals.CATALINA_BASE_PROP);
+        }
+    }
+    // last resort - for minimal/embedded cases.
+    if(catalinaHome==null) {
+        catalinaHome=System.getProperty(&quot;user.dir&quot;);
+    }
+    if (catalinaHome != null) {
+        File home = new File(catalinaHome);
+        if (!home.isAbsolute()) {
+            try {
+                catalinaHome = home.getCanonicalPath();
+            } catch (IOException e) {
+                catalinaHome = home.getAbsolutePath();
+            }
+        }
+        System.setProperty(Globals.CATALINA_HOME_PROP, catalinaHome);
+    }
+
+    if (System.getProperty(Globals.CATALINA_BASE_PROP) == null) {
+        System.setProperty(Globals.CATALINA_BASE_PROP,
+                           catalinaHome);
+    } else {
+        String catalinaBase = System.getProperty(Globals.CATALINA_BASE_PROP);
+        File base = new File(catalinaBase);
+        if (!base.isAbsolute()) {
+            try {
+                catalinaBase = base.getCanonicalPath();
+            } catch (IOException e) {
+                catalinaBase = base.getAbsolutePath();
+            }
+        }
+        System.setProperty(Globals.CATALINA_BASE_PROP, catalinaBase);
+    }
+
+    String temp = System.getProperty(&quot;java.io.tmpdir&quot;);
+    if (temp == null || (!(new File(temp)).exists())
+            || (!(new File(temp)).isDirectory())) {
+        log.error(sm.getString(&quot;embedded.notmp&quot;, temp));
+    }
+
+}
+</code></pre><h2 id="1-2、initNaming-方法给系统设置java-naming-factory-url-pkgs和java-naming-factory-initial"><a href="#1-2、initNaming-方法给系统设置java-naming-factory-url-pkgs和java-naming-factory-initial" class="headerlink" title="1.2、initNaming()方法给系统设置java.naming.factory.url.pkgs和java.naming.factory.initial"></a>1.2、initNaming()方法给系统设置java.naming.factory.url.pkgs和java.naming.factory.initial</h2><pre><code> protected void initNaming() {
+    // Setting additional variables
+    if (!useNaming) {
+        log.info( &quot;Catalina naming disabled&quot;);
+        System.setProperty(&quot;catalina.useNaming&quot;, &quot;false&quot;);
+    } else {
+        System.setProperty(&quot;catalina.useNaming&quot;, &quot;true&quot;);
+        String value = &quot;org.apache.naming&quot;;
+        String oldValue =
+            System.getProperty(javax.naming.Context.URL_PKG_PREFIXES);
+        if (oldValue != null) {
+            value = value + &quot;:&quot; + oldValue;
+        }
+        System.setProperty(javax.naming.Context.URL_PKG_PREFIXES, value);
+        if( log.isDebugEnabled() ) {
+            log.debug(&quot;Setting naming prefix=&quot; + value);
+        }
+        value = System.getProperty
+            (javax.naming.Context.INITIAL_CONTEXT_FACTORY);
+        if (value == null) {
+            System.setProperty
+                (javax.naming.Context.INITIAL_CONTEXT_FACTORY,
+                 &quot;org.apache.naming.java.javaURLContextFactory&quot;);
+        } else {
+            log.debug( &quot;INITIAL_CONTEXT_FACTORY already set &quot; + value );
+        }
+    }
+}
+</code></pre><p>在创建JNDI上下文时，使用Context.INITIAL <em> CONTEXT </em> FACTORY（”java.naming.factory.initial”）属性，来指定创建JNDI上下文的工厂类；Context.URL <em> PKG </em> PREFIXES(“java.naming.factory.url.pkgs”)用在查询url中包括scheme方法id时创建对应的JNDI上下文.</p>
+<h2 id="1-3、createStartDigester-创建并配置将要用来启动的Digester实例，并且设置一些列Rule，具体映射到server-xml"><a href="#1-3、createStartDigester-创建并配置将要用来启动的Digester实例，并且设置一些列Rule，具体映射到server-xml" class="headerlink" title="1.3、createStartDigester()创建并配置将要用来启动的Digester实例，并且设置一些列Rule，具体映射到server.xml"></a>1.3、createStartDigester()创建并配置将要用来启动的Digester实例，并且设置一些列Rule，具体映射到server.xml</h2><pre><code>/**
+ * Create and configure the Digester we will be using for startup.
+ */
+protected Digester createStartDigester() {
+    long t1=System.currentTimeMillis();
+    // Initialize the digester
+    Digester digester = new Digester();
+    digester.setValidating(false);
+    digester.setRulesValidation(true);
+    HashMap&lt;Class&lt;?&gt;, List&lt;String&gt;&gt; fakeAttributes =
+        new HashMap&lt;Class&lt;?&gt;, List&lt;String&gt;&gt;();
+    ArrayList&lt;String&gt; attrs = new ArrayList&lt;String&gt;();
+    attrs.add(&quot;className&quot;);
+    fakeAttributes.put(Object.class, attrs);
+    digester.setFakeAttributes(fakeAttributes);
+    digester.setUseContextClassLoader(true);
+
+    // Configure the actions we will be using
+    digester.addObjectCreate(&quot;Server&quot;,
+                             &quot;org.apache.catalina.core.StandardServer&quot;,
+                             &quot;className&quot;);
+    digester.addSetProperties(&quot;Server&quot;);
+    digester.addSetNext(&quot;Server&quot;,
+                        &quot;setServer&quot;,
+                        &quot;org.apache.catalina.Server&quot;);
+
+    digester.addObjectCreate(&quot;Server/GlobalNamingResources&quot;,
+                             &quot;org.apache.catalina.deploy.NamingResources&quot;);
+    digester.addSetProperties(&quot;Server/GlobalNamingResources&quot;);
+    digester.addSetNext(&quot;Server/GlobalNamingResources&quot;,
+                        &quot;setGlobalNamingResources&quot;,
+                        &quot;org.apache.catalina.deploy.NamingResources&quot;);
+
+    digester.addObjectCreate(&quot;Server/Listener&quot;,
+                             null, // MUST be specified in the element
+                             &quot;className&quot;);
+    digester.addSetProperties(&quot;Server/Listener&quot;);
+    digester.addSetNext(&quot;Server/Listener&quot;,
+                        &quot;addLifecycleListener&quot;,
+                        &quot;org.apache.catalina.LifecycleListener&quot;);
+
+    digester.addObjectCreate(&quot;Server/Service&quot;,
+                             &quot;org.apache.catalina.core.StandardService&quot;,
+                             &quot;className&quot;);
+    digester.addSetProperties(&quot;Server/Service&quot;);
+    digester.addSetNext(&quot;Server/Service&quot;,
+                        &quot;addService&quot;,
+                        &quot;org.apache.catalina.Service&quot;);
+
+    digester.addObjectCreate(&quot;Server/Service/Listener&quot;,
+                             null, // MUST be specified in the element
+                             &quot;className&quot;);
+    digester.addSetProperties(&quot;Server/Service/Listener&quot;);
+    digester.addSetNext(&quot;Server/Service/Listener&quot;,
+                        &quot;addLifecycleListener&quot;,
+                        &quot;org.apache.catalina.LifecycleListener&quot;);
+
+    //Executor
+    digester.addObjectCreate(&quot;Server/Service/Executor&quot;,
+                     &quot;org.apache.catalina.core.StandardThreadExecutor&quot;,
+                     &quot;className&quot;);
+    digester.addSetProperties(&quot;Server/Service/Executor&quot;);
+
+    digester.addSetNext(&quot;Server/Service/Executor&quot;,
+                        &quot;addExecutor&quot;,
+                        &quot;org.apache.catalina.Executor&quot;);
+
+
+    digester.addRule(&quot;Server/Service/Connector&quot;,
+                     new ConnectorCreateRule());
+    digester.addRule(&quot;Server/Service/Connector&quot;,
+                     new SetAllPropertiesRule(new String[]{&quot;executor&quot;}));
+    digester.addSetNext(&quot;Server/Service/Connector&quot;,
+                        &quot;addConnector&quot;,
+                        &quot;org.apache.catalina.connector.Connector&quot;);
+
+
+    digester.addObjectCreate(&quot;Server/Service/Connector/Listener&quot;,
+                             null, // MUST be specified in the element
+                             &quot;className&quot;);
+    digester.addSetProperties(&quot;Server/Service/Connector/Listener&quot;);
+    digester.addSetNext(&quot;Server/Service/Connector/Listener&quot;,
+                        &quot;addLifecycleListener&quot;,
+                        &quot;org.apache.catalina.LifecycleListener&quot;);
+
+    // Add RuleSets for nested elements
+    digester.addRuleSet(new NamingRuleSet(&quot;Server/GlobalNamingResources/&quot;));
+    digester.addRuleSet(new EngineRuleSet(&quot;Server/Service/&quot;));
+    digester.addRuleSet(new HostRuleSet(&quot;Server/Service/Engine/&quot;));
+    digester.addRuleSet(new ContextRuleSet(&quot;Server/Service/Engine/Host/&quot;));
+    addClusterRuleSet(digester, &quot;Server/Service/Engine/Host/Cluster/&quot;);
+    digester.addRuleSet(new NamingRuleSet(&quot;Server/Service/Engine/Host/Context/&quot;));
+
+    // When the &apos;engine&apos; is found, set the parentClassLoader.
+    digester.addRule(&quot;Server/Service/Engine&quot;,
+                     new SetParentClassLoaderRule(parentClassLoader));
+    addClusterRuleSet(digester, &quot;Server/Service/Engine/Cluster/&quot;);
+
+    long t2=System.currentTimeMillis();
+    if (log.isDebugEnabled()) {
+        log.debug(&quot;Digester for server.xml created &quot; + ( t2-t1 ));
+    }
+    return (digester);
+
+}
+</code></pre><p>从上面的代码可以看出：首先创建Digester，Digester继承了DefaultHandler，而DefaultHandler默认实现了ContentHander、DTDHander、ErrorHandler及EntityResolver 这4个接口，代码如下：</p>
+<pre><code>public class DefaultHandler implements EntityResolver, DTDHandler, ContentHandler, ErrorHandler
+</code></pre><p>通过源码可以发现DefaultHandler的所有实现都是空实现，所以解析还需要Digester。（具体分析后面在说）。</p>
+<h2 id="1-4、configFile-获取配置文件conf-server-xml，并使用FileInputStream获取conf-server-xml配置文件输入流"><a href="#1-4、configFile-获取配置文件conf-server-xml，并使用FileInputStream获取conf-server-xml配置文件输入流" class="headerlink" title="1.4、configFile()获取配置文件conf/server.xml，并使用FileInputStream获取conf/server.xml配置文件输入流"></a>1.4、configFile()获取配置文件conf/server.xml，并使用FileInputStream获取conf/server.xml配置文件输入流</h2><pre><code>/**
+ * Return a File object representing our configuration file.
+ */
+protected File configFile() {
+
+    File file = new File(configFile);
+    if (!file.isAbsolute()) {
+        file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), configFile);
+    }
+    return (file);
+
+}
+</code></pre><h2 id="1-5、将FileInputStream封装为InputSource，并且调用Digester的parse方法进行解析"><a href="#1-5、将FileInputStream封装为InputSource，并且调用Digester的parse方法进行解析" class="headerlink" title="1.5、将FileInputStream封装为InputSource，并且调用Digester的parse方法进行解析"></a>1.5、将FileInputStream封装为InputSource，并且调用Digester的parse方法进行解析</h2><pre><code>inputSource.setByteStream(inputStream);
+digester.push(this);
+digester.parse(inputSource);
+</code></pre><h2 id="1-6、initStreams-对输出流、错误流重定向"><a href="#1-6、initStreams-对输出流、错误流重定向" class="headerlink" title="1.6、initStreams()对输出流、错误流重定向"></a>1.6、initStreams()对输出流、错误流重定向</h2><pre><code>  protected void initStreams() {
+    // Replace System.out and System.err with a custom PrintStream
+    System.setOut(new SystemLogHandler(System.out));
+    System.setErr(new SystemLogHandler(System.err));
+}    
+</code></pre><h2 id="1-7、初始化server"><a href="#1-7、初始化server" class="headerlink" title="1.7、初始化server"></a>1.7、初始化server</h2><pre><code>// Start the new server
+    try {
+        getServer().init();
+    } catch (LifecycleException e) {
+        if (Boolean.getBoolean(&quot;org.apache.catalina.startup.EXIT_ON_INIT_FAILURE&quot;)) {
+            throw new java.lang.Error(e);
+        } else {
+            log.error(&quot;Catalina.start&quot;, e);
+        }
+
+    }
+</code></pre><h1 id="2、文件的解析"><a href="#2、文件的解析" class="headerlink" title="2、文件的解析"></a>2、文件的解析</h1><p>当加载server.xml配置文件到内存后，开始对XML文件中的内容进行解析，主要包含两个步骤：</p>
+<ol>
+<li>构造server.xml的规则，这些规则即可以用于构造Tomcat内部的容器（如StandardServer，StandardService等），也可以对server.xml进行合法性检查。如果server.xml不符合Tomcat内置的规则，在解析时将抛出异常，进而导致Tomcat无法启动。</li>
+<li>使用SAX解析server.xml，边解析边应用规则，最终使用server.xml中的配置构建好Tomcat所需的各种容器。</li>
+</ol>
+<p><img src="http://i.imgur.com/0G69ss1.jpg" alt=""></p>
+<p>Tomcat将server.xml文件中的所有元素上的属性都抽象为Rule，以Server元素为例，在内存中对应Server实例，Server实例的属性值就来自于Server元素的属性值。通过对规则（Rule）的应用，最终改变Server实例的属性值。Rule是一个抽象类，其中定义了以下方法：</p>
+<p><img src="http://i.imgur.com/5TROnzW.png" alt=""></p>
+<ul>
+<li>getDigester：获取Digester实例；</li>
+<li>setDigester：设置Digester实例；</li>
+<li>getNamespaceURI：获取Rule所在的相对命名空间URI；</li>
+<li>setNamespaceURI：设置Rule所在的相对命名空间URI；</li>
+<li>begin(String namespace, String name, Attributes attributes)：此方法在遇到一个匹配的XML元素的开头时被调用，如<server>；</server></li>
+<li>body(String namespace, String name, String text)：在遇到匹配XML元素的body时，此方法被调用，如进入标签内部时；</li>
+<li>end(String namespace, String name)：此方法在遇到一个匹配的XML元素的末尾时被调用。如：&lt; /Server&gt;；</li>
+</ul>
+<p>Rule目前有很多实现类，如：NodeCreateRule、AbsoluteOrderingRule、CallParamRule、ConnectorCreateRule等。下图展示了Rule的部分实现类：</p>
+<p><img src="http://i.imgur.com/AU4umDE.png" alt=""></p>
+<p>Tomcat使用SAX（Simple API for XML)解析XML:</p>
+<p>SAX解析XML采用的是从上而下的基于事件驱动的解析方式，在解析过程中会视情况自动调用ContentHandler接口中的startDocument()、startElement()、characters()、endElement()、endDocument()等相关的方法。</p>
+<p>由编译执行的结果分析：</p>
+<ul>
+<li>startDocument()方法只会在文档开始解析的时候被调用，每次解析只会调用一次。</li>
+<li>startElement()方法每次在开始解析一个元素，即遇到元素标签开始的时候都会调用。</li>
+<li>characters()方法也是在每次解析到元素标签携带的内容时都会调用，即使该元素标签的内容为空或换行。而且如果元素内嵌套元素，在父元素结束标签前， characters()方法会再次被调用，此处需要注意。</li>
+<li>endElement()方法每次在结束解析一个元素，即遇到元素标签结束的时候都会调用。</li>
+<li>endDocument()方法只会在文档解析结束的时候被调用，每次解析只会调用一次。</li>
+</ul>
+<p>使用SAX解析XML的好处：</p>
+<ul>
+<li>SAX 不用解析完整个文档</li>
+<li>相比于 DOM 而言 SAX 是一种速度更快，更有效，占用内存更少的解析 XML 文件的方法</li>
+<li>逐行扫描，可以做到边扫描边解析，因此 SAX 可以在解析文档的任意时刻停止解析</li>
+</ul>
+<p>由于SAX是基于事件驱动的，不用解析完整个文档，在按内容顺序解析文档过程中， SAX 会判断当前读到的字符是否符合 XML 文件语法中的某部分。如果符合某部分，则会触发事件。所谓触发事件，就是调用一些回调方法。在用 SAX 解析 xml 文档时候，在读取到文档开始和结束标签时候就会回调一个事件，在读取到其他节点与内容时候也会回调一个事件。在 SAX 接口中，事件源是 org.xml.sax 包中的 XMLReader ，它通过 parser() 方法来解析 XML 文档，并产生事件。事件处理器是 org.xml.sax 包中 ContentHander 、 DTDHander 、 ErrorHandler ，以及 EntityResolver 这4个接口：</p>
+<ol>
+<li>ContentHander （    XML 文档的开始与结束）setContentHandler(ContentHandler h) </li>
+<li>DTDHander （    处理 DTD 解析）    setDTDHandler(DTDHandler h) </li>
+<li>ErrorHandler （    处理 XML 时产生的错误）setErrorHandler(ErrorHandler h) </li>
+<li>EntityResolver （处理外部实体） setEntityResolver(EntityResolver e)  </li>
+</ol>
+<p>回调方法一般都定义在ContentHandler接口中，上面已经对这些回调方法的加载顺序已经说了就不在介绍了。</p>
+<p>使用 SAX 解析 XML 文件一般有以下五个步骤： </p>
+<ol>
+<li>创建一个 SAXParserFactory 对象； </li>
+<li>调用 SAXParserFactory 中的 newSAXParser 方法创建一个 SAXParser 对象； </li>
+<li>然后在调用 SAXParser 中的 getXMLReader 方法获取一个 XMLReader 对象；</li>
+<li>实例化一个 DefaultHandler 对象；</li>
+<li>连接事件源对象 XMLReader 到事件处理类 DefaultHandler 中；</li>
+<li>调用 XMLReader 的 parse 方法从输入源中获取到的 xml 数据；</li>
+<li>通过 DefaultHandler 返回我们需要的数据集合。</li>
+</ol>
+<p>我们通过源码可以发现DefaultHandler的所有实现都是空实现，所以解析还需要Digester自身，代码如下：</p>
+<pre><code>  @Override
+public void startDocument() throws SAXException {
+
+    if (saxLog.isDebugEnabled()) {
+        saxLog.debug(&quot;startDocument()&quot;);
+    }
+
+    // ensure that the digester is properly configured, as 
+    // the digester could be used as a SAX ContentHandler
+    // rather than via the parse() methods.
+    configure();
+}
+
+@Override
+public void startElement(String namespaceURI, String localName,
+                         String qName, Attributes list)
+        throws SAXException {
+    boolean debug = log.isDebugEnabled();
+
+    if (saxLog.isDebugEnabled()) {
+        saxLog.debug(&quot;startElement(&quot; + namespaceURI + &quot;,&quot; + localName + &quot;,&quot; +
+                qName + &quot;)&quot;);
+    }
+
+    // Parse system properties
+    list = updateAttributes(list);
+
+    // Save the body text accumulated for our surrounding element
+    bodyTexts.push(bodyText);
+    bodyText = new StringBuilder();
+
+    // the actual element name is either in localName or qName, depending 
+    // on whether the parser is namespace aware
+    String name = localName;
+    if ((name == null) || (name.length() &lt; 1)) {
+        name = qName;
+    }
+
+    // Compute the current matching rule
+    StringBuilder sb = new StringBuilder(match);
+    if (match.length() &gt; 0) {
+        sb.append(&apos;/&apos;);
+    }
+    sb.append(name);
+    match = sb.toString();
+    if (debug) {
+        log.debug(&quot;  New match=&apos;&quot; + match + &quot;&apos;&quot;);
+    }
+
+    // Fire &quot;begin&quot; events for all relevant rules
+    List&lt;Rule&gt; rules = getRules().match(namespaceURI, match);
+    matches.push(rules);
+    if ((rules != null) &amp;&amp; (rules.size() &gt; 0)) {
+        for (int i = 0; i &lt; rules.size(); i++) {
+            try {
+                Rule rule = rules.get(i);
+                if (debug) {
+                    log.debug(&quot;  Fire begin() for &quot; + rule);
+                }
+                rule.begin(namespaceURI, name, list);
+            } catch (Exception e) {
+                log.error(&quot;Begin event threw exception&quot;, e);
+                throw createSAXException(e);
+            } catch (Error e) {
+                log.error(&quot;Begin event threw error&quot;, e);
+                throw e;
+            }
+        }
+    } else {
+        if (debug) {
+            log.debug(&quot;  No rules found matching &apos;&quot; + match + &quot;&apos;.&quot;);
+        }
+    }
+
+}
+
+@Override
+public void endDocument() throws SAXException {
+
+    if (saxLog.isDebugEnabled()) {
+        if (getCount() &gt; 1) {
+            saxLog.debug(&quot;endDocument():  &quot; + getCount() +
+                         &quot; elements left&quot;);
+        } else {
+            saxLog.debug(&quot;endDocument()&quot;);
+        }
+    }
+
+    while (getCount() &gt; 1) {
+        pop();
+    }
+
+    // Fire &quot;finish&quot; events for all defined rules
+    Iterator&lt;Rule&gt; rules = getRules().rules().iterator();
+    while (rules.hasNext()) {
+        Rule rule = rules.next();
+        try {
+            rule.finish();
+        } catch (Exception e) {
+            log.error(&quot;Finish event threw exception&quot;, e);
+            throw createSAXException(e);
+        } catch (Error e) {
+            log.error(&quot;Finish event threw error&quot;, e);
+            throw e;
+        }
+    }
+
+    // Perform final cleanup
+    clear();
+
+}
+
+@Override
+public void endElement(String namespaceURI, String localName,
+                       String qName) throws SAXException {
+
+    boolean debug = log.isDebugEnabled();
+
+    if (debug) {
+        if (saxLog.isDebugEnabled()) {
+            saxLog.debug(&quot;endElement(&quot; + namespaceURI + &quot;,&quot; + localName +
+                    &quot;,&quot; + qName + &quot;)&quot;);
+        }
+        log.debug(&quot;  match=&apos;&quot; + match + &quot;&apos;&quot;);
+        log.debug(&quot;  bodyText=&apos;&quot; + bodyText + &quot;&apos;&quot;);
+    }
+
+    // Parse system properties
+    bodyText = updateBodyText(bodyText);
+
+    // the actual element name is either in localName or qName, depending 
+    // on whether the parser is namespace aware
+    String name = localName;
+    if ((name == null) || (name.length() &lt; 1)) {
+        name = qName;
+    }
+
+    // Fire &quot;body&quot; events for all relevant rules
+    List&lt;Rule&gt; rules = matches.pop();
+    if ((rules != null) &amp;&amp; (rules.size() &gt; 0)) {
+        String bodyText = this.bodyText.toString();
+        for (int i = 0; i &lt; rules.size(); i++) {
+            try {
+                Rule rule = rules.get(i);
+                if (debug) {
+                    log.debug(&quot;  Fire body() for &quot; + rule);
+                }
+                rule.body(namespaceURI, name, bodyText);
+            } catch (Exception e) {
+                log.error(&quot;Body event threw exception&quot;, e);
+                throw createSAXException(e);
+            } catch (Error e) {
+                log.error(&quot;Body event threw error&quot;, e);
+                throw e;
+            }
+        }
+    } else {
+        if (debug) {
+            log.debug(&quot;  No rules found matching &apos;&quot; + match + &quot;&apos;.&quot;);
+        }
+        if (rulesValidation) {
+            log.warn(&quot;  No rules found matching &apos;&quot; + match + &quot;&apos;.&quot;);
+        }
+    }
+
+    // Recover the body text from the surrounding element
+    bodyText = bodyTexts.pop();
+
+    // Fire &quot;end&quot; events for all relevant rules in reverse order
+    if (rules != null) {
+        for (int i = 0; i &lt; rules.size(); i++) {
+            int j = (rules.size() - i) - 1;
+            try {
+                Rule rule = rules.get(j);
+                if (debug) {
+                    log.debug(&quot;  Fire end() for &quot; + rule);
+                }
+                rule.end(namespaceURI, name);
+            } catch (Exception e) {
+                log.error(&quot;End event threw exception&quot;, e);
+                throw createSAXException(e);
+            } catch (Error e) {
+                log.error(&quot;End event threw error&quot;, e);
+                throw e;
+            }
+        }
+    }
+
+    // Recover the previous match expression
+    int slash = match.lastIndexOf(&apos;/&apos;);
+    if (slash &gt;= 0) {
+        match = match.substring(0, slash);
+    } else {
+        match = &quot;&quot;;
+    }
+
+}
+</code></pre><p>当我们创建好Digester后，会调用addObjectCreate、addSetProperties、addSetNext方法陆续添加很多Rule，这些方法的实现如代码：</p>
+<pre><code> public void addObjectCreate(String pattern, String className,
+                            String attributeName) {
+
+    addRule(pattern,
+            new ObjectCreateRule(className, attributeName));
+
+}
+
+ public void addSetProperties(String pattern) {
+
+    addRule(pattern,
+            new SetPropertiesRule());
+
+}
+
+public void addSetNext(String pattern, String methodName,
+                       String paramType) {
+
+    addRule(pattern,
+            new SetNextRule(methodName, paramType));
+
+}
+</code></pre><p>这三个方法分别创建ObjectCreateRule、SetPropertiesRule及SetNextRule，为了便于理解，我们举例说明(Server标签)：</p>
+<pre><code>digester.addObjectCreate(&quot;Server&quot;,&quot;org.apache.catalina.core.StandardServer&quot;,&quot;className&quot;);
+digester.addSetProperties(&quot;Server&quot;);
+digester.addSetNext(&quot;Server&quot;,&quot;setServer&quot;, &quot;org.apache.catalina.Server&quot;);
+</code></pre><p>我们知道最终会创建ObjectCreateRule、SetPropertiesRule及SetNextRule，并且调用addRule方法。</p>
+<pre><code> public void addRule(String pattern, Rule rule) {
+
+    rule.setDigester(this);
+    getRules().add(pattern, rule);
+
+}
+</code></pre><p>从代码可以看出，addRule方法首先调用getRules方法获取RulesBase，然后调用RulesBase的add方法。代码如下：</p>
+<pre><code>//getRules()获取RulesBase
+public Rules getRules() {
+
+    if (this.rules == null) {
+        this.rules = new RulesBase();
+        this.rules.setDigester(this);
+    }
+    return (this.rules);
+
+}
+
+//RulesBase的add方法
+@Override
+public void add(String pattern, Rule rule) {
+    // to help users who accidently add &apos;/&apos; to the end of their patterns
+    int patternLength = pattern.length();
+    if (patternLength&gt;1 &amp;&amp; pattern.endsWith(&quot;/&quot;)) {
+        pattern = pattern.substring(0, patternLength-1);
+    }
+
+
+    List&lt;Rule&gt; list = cache.get(pattern);
+    if (list == null) {
+        list = new ArrayList&lt;Rule&gt;();
+        cache.put(pattern, list);
+    }
+    list.add(rule);
+    rules.add(rule);
+    if (this.digester != null) {
+        rule.setDigester(this.digester);
+    }
+    if (this.namespaceURI != null) {
+        rule.setNamespaceURI(this.namespaceURI);
+    }
+
+}
+</code></pre><p>其中，cache的数据结构为HashMap<string,list<rule>&gt;，每个键值维护一个List<rule>，由此可知，对Server标签来说，对应的Rule列表为ObjectCreateRule、SetPropertiesRule及SetNextRule。</rule></string,list<rule></p>
+<p>Digester解析XML的入口是其parse方法，其处理步骤如下：</p>
+<p>1.创建XMLReader ；</p>
+<p>2.使用XMLReader解析XML。</p>
+<pre><code>public Object parse(InputSource input) throws IOException, SAXException {
+
+    configure();
+    getXMLReader().parse(input);
+    return (root);
+
+}
+//configure()
+protected void configure() {
+
+    // Do not configure more than once
+    if (configured) {
+        return;
+    }
+
+    log = LogFactory.getLog(&quot;org.apache.tomcat.util.digester.Digester&quot;);
+    saxLog = LogFactory.getLog(&quot;org.apache.tomcat.util.digester.Digester.sax&quot;);
+
+    // Perform lazy configuration as needed
+    initialize(); // call hook method for subclasses that want to be initialized once only
+    // Nothing else required by default
+
+    // Set the configuration flag to avoid repeating
+    configured = true;
+
+}
+</code></pre><p>getXMLReader方法调用getParser创建SAXParser ，然后调用SAXParser 的getXMLReader方法创建XMLReader.</p>
+<pre><code>public XMLReader getXMLReader() throws SAXException {
+    if (reader == null){
+        reader = getParser().getXMLReader();
+    }        
+
+    reader.setDTDHandler(this);           
+    reader.setContentHandler(this);        
+
+    if (entityResolver == null){
+        reader.setEntityResolver(this);
+    } else {
+        reader.setEntityResolver(entityResolver);           
+    }
+
+    reader.setProperty(
+            &quot;http://xml.org/sax/properties/lexical-handler&quot;, this);
+
+    reader.setErrorHandler(this);
+    return reader;
+}
+</code></pre><p>getParser方法调用getFactory方法创建SAXParserFactory，然后调用SAXParserFactory的newSAXParser方法创建SAXParser</p>
+<pre><code>public SAXParser getParser() {
+
+    // Return the parser we already created (if any)
+    if (parser != null) {
+        return (parser);
+    }
+
+    // Create a new parser
+    try {
+        parser = getFactory().newSAXParser();
+    } catch (Exception e) {
+        log.error(&quot;Digester.getParser: &quot;, e);
+        return (null);
+    }
+
+    return (parser);
+
+}
+</code></pre><p>getFactory方法使用SAX的API生成SAXParserFactory实例.</p>
+<pre><code>public SAXParserFactory getFactory() throws SAXNotRecognizedException, SAXNotSupportedException,ParserConfigurationException {
+
+    if (factory == null) {
+        factory = SAXParserFactory.newInstance();
+
+        factory.setNamespaceAware(namespaceAware);
+        // Preserve xmlns attributes
+        if (namespaceAware) {
+            factory.setFeature(
+                    &quot;http://xml.org/sax/features/namespace-prefixes&quot;,
+                    true);
+        }
+
+        factory.setValidating(validating);
+        if (validating) {
+            // Enable DTD validation
+            factory.setFeature(
+                    &quot;http://xml.org/sax/features/validation&quot;,
+                    true);
+            // Enable schema validation
+            factory.setFeature(
+                    &quot;http://apache.org/xml/features/validation/schema&quot;,
+                    true);
+        }
+    }
+    return (factory);
+
+}
+</code></pre><p>XMLReader解析XML时，会生成事件，回调Digester的startDocument方法，解析的第一个元素是Server，此时回调Digester的startElement方法，入参Attributes list即Server上的属性，如port、shutdown等，入参qName即为Server.</p>
+<pre><code> @Override
+public void startElement(String namespaceURI, String localName,
+                         String qName, Attributes list)
+        throws SAXException {
+    boolean debug = log.isDebugEnabled();
+
+    if (saxLog.isDebugEnabled()) {
+        saxLog.debug(&quot;startElement(&quot; + namespaceURI + &quot;,&quot; + localName + &quot;,&quot; +
+                qName + &quot;)&quot;);
+    }
+
+    // Parse system properties
+    list = updateAttributes(list);
+
+    // Save the body text accumulated for our surrounding element
+    bodyTexts.push(bodyText);
+    bodyText = new StringBuilder();
+
+    // the actual element name is either in localName or qName, depending 
+    // on whether the parser is namespace aware
+    String name = localName;
+    if ((name == null) || (name.length() &lt; 1)) {
+        name = qName;
+    }
+
+    // Compute the current matching rule
+    StringBuilder sb = new StringBuilder(match);
+    if (match.length() &gt; 0) {
+        sb.append(&apos;/&apos;);
+    }
+    sb.append(name);
+    match = sb.toString();
+    if (debug) {
+        log.debug(&quot;  New match=&apos;&quot; + match + &quot;&apos;&quot;);
+    }
+
+    // Fire &quot;begin&quot; events for all relevant rules
+    List&lt;Rule&gt; rules = getRules().match(namespaceURI, match);
+    matches.push(rules);
+    if ((rules != null) &amp;&amp; (rules.size() &gt; 0)) {
+        for (int i = 0; i &lt; rules.size(); i++) {
+            try {
+                Rule rule = rules.get(i);
+                if (debug) {
+                    log.debug(&quot;  Fire begin() for &quot; + rule);
+                }
+                rule.begin(namespaceURI, name, list);
+            } catch (Exception e) {
+                log.error(&quot;Begin event threw exception&quot;, e);
+                throw createSAXException(e);
+            } catch (Error e) {
+                log.error(&quot;Begin event threw error&quot;, e);
+                throw e;
+            }
+        }
+    } else {
+        if (debug) {
+            log.debug(&quot;  No rules found matching &apos;&quot; + match + &quot;&apos;.&quot;);
+        }
+    }
+
+}
+</code></pre><p>startElement方法的处理步骤如下：</p>
+<p>1.match刚开始为空字符串，拼接Server后变为Server。</p>
+<p>2.调用RulesBase的match方法，返回cache中按照键值Server匹配的ObjectCreateRule、SetPropertiesRule及SetNextRule。</p>
+<p>3.循环列表依次遍历ObjectCreateRule、SetPropertiesRule及SetNextRule，并调用它们的begin方法。</p>
+<p>ObjectCreateRule的begin方法将生成Server的实例（默认为”org.apache.catalina.core.StandardServer”，用户可以通过给Server标签指定className使用其它Server实现），最后将Server的实例压入Digester的栈中.</p>
+<pre><code>@Override
+public void begin(String namespace, String name, Attributes attributes)
+        throws Exception {
+
+    // Identify the name of the class to instantiate
+    String realClassName = className;
+    if (attributeName != null) {
+        String value = attributes.getValue(attributeName);
+        if (value != null) {
+            realClassName = value;
+        }
+    }
+    if (digester.log.isDebugEnabled()) {
+        digester.log.debug(&quot;[ObjectCreateRule]{&quot; + digester.match +
+                &quot;}New &quot; + realClassName);
+    }
+
+    if (realClassName == null) {
+        throw new NullPointerException(&quot;No class name specified for &quot; +
+                namespace + &quot; &quot; + name);
+    }
+
+    // Instantiate the new object and push it on the context stack
+    Class&lt;?&gt; clazz = digester.getClassLoader().loadClass(realClassName);
+    Object instance = clazz.newInstance();
+    digester.push(instance);
+}
+</code></pre><p>SetPropertiesRule的begin方法首先将刚才压入栈中的Server实例出栈，然后给Server实例设置各个属性值，如port、shutdown等:</p>
+<pre><code>@Override
+public void begin(String namespace, String theName, Attributes attributes)
+        throws Exception {
+
+    // Populate the corresponding properties of the top object
+    Object top = digester.peek();
+    if (digester.log.isDebugEnabled()) {
+        if (top != null) {
+            digester.log.debug(&quot;[SetPropertiesRule]{&quot; + digester.match +
+                               &quot;} Set &quot; + top.getClass().getName() +
+                               &quot; properties&quot;);
+        } else {
+            digester.log.debug(&quot;[SetPropertiesRule]{&quot; + digester.match +
+                               &quot;} Set NULL properties&quot;);
+        }
+    }
+
+    // set up variables for custom names mappings
+    int attNamesLength = 0;
+    if (attributeNames != null) {
+        attNamesLength = attributeNames.length;
+    }
+    int propNamesLength = 0;
+    if (propertyNames != null) {
+        propNamesLength = propertyNames.length;
+    }
+
+    for (int i = 0; i &lt; attributes.getLength(); i++) {
+        String name = attributes.getLocalName(i);
+        if (&quot;&quot;.equals(name)) {
+            name = attributes.getQName(i);
+        }
+        String value = attributes.getValue(i);
+
+        // we&apos;ll now check for custom mappings
+        for (int n = 0; n&lt;attNamesLength; n++) {
+            if (name.equals(attributeNames[n])) {
+                if (n &lt; propNamesLength) {
+                    // set this to value from list
+                    name = propertyNames[n];
+
+                } else {
+                    // set name to null
+                    // we&apos;ll check for this later
+                    name = null;
+                }
+                break;
+            }
+        } 
+
+        if (digester.log.isDebugEnabled()) {
+            digester.log.debug(&quot;[SetPropertiesRule]{&quot; + digester.match +
+                    &quot;} Setting property &apos;&quot; + name + &quot;&apos; to &apos;&quot; +
+                    value + &quot;&apos;&quot;);
+        }
+        if (!digester.isFakeAttribute(top, name) 
+                &amp;&amp; !IntrospectionUtils.setProperty(top, name, value) 
+                &amp;&amp; digester.getRulesValidation()) {
+            digester.log.warn(&quot;[SetPropertiesRule]{&quot; + digester.match +
+                    &quot;} Setting property &apos;&quot; + name + &quot;&apos; to &apos;&quot; +
+                    value + &quot;&apos; did not find a matching property.&quot;);
+        }
+    }
+
+}
+</code></pre><p>SetNextRule的begin不做什么动作。当遇到Server的结束标签时，还会依次调用ObjectCreateRule、SetPropertiesRule及SetNextRule的end方法，不再赘述。所有元素的解析都与Server标签同理，最终将server.xml文件中设置的元素及其属性值，构造出tomcat中的容器，如：Server、Service、Connector等.</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://zhengweishan.oschina.io/2017/03/01/（四）Tomcat_7.0.70 server.xml文件的加载与解析/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://zhengweishan.oschina.io/2017/03/01/（四）Tomcat_7.0.70 server.xml文件的加载与解析/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/03/01/（五）Tomcat_7.0.70类加载体系/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    (no title)
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/03/01/（三）Tomcat_7.0.70停止分析/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title"></div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2017/03/01/（四）Tomcat_7.0.70 server.xml文件的加载与解析/" data-title="" data-url="http://zhengweishan.oschina.io/2017/03/01/（四）Tomcat_7.0.70 server.xml文件的加载与解析/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习（四）---- Kafka整合SpringMVC实例（二）/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习（四）---- Kafka整合SpringMVC实例（二）/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.035Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习(一) ---- 基本概念以及环境搭建/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习(一) ---- 基本概念以及环境搭建/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.035Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习（三）---- Kafka整合SpringMVC实例/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习（三）---- Kafka整合SpringMVC实例/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.034Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.026Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/JMS学习（四）Spring和ActiveMQ整合的完整实例/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/JMS学习（四）Spring和ActiveMQ整合的完整实例/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.025Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Elasticsearch/">Elasticsearch</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JMS/">JMS</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JVM/">JVM</a><span class="category-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/ActiveMQ/" style="font-size: 10px;">ActiveMQ</a> <a href="/tags/Elasticsearch学习/" style="font-size: 15px;">Elasticsearch学习</a> <a href="/tags/GC/" style="font-size: 15px;">GC</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/JAVA/" style="font-size: 20px;">JAVA</a> <a href="/tags/JMS/" style="font-size: 10px;">JMS</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Reflection/" style="font-size: 10px;">Reflection</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2017 郑伟山 版权所有<br> 
+            由 <a href="http://hexo.io/" target="_blank">Hexo</a> 强力驱动 &brvbar; 主题 -- <a href="https://github.com/ppoffice/hexo-theme-icarus">Icarus</a><br>
+            
+        </div>
+		<div class="inner">
+        	<span id="busuanzi_container_site_pv">
+    			本站总访问量<span id="busuanzi_value_site_pv" class="foot-count"></span>次
+			</span> &brvbar;
+			<span id="busuanzi_container_site_uv">
+  				您是本站第<span id="busuanzi_value_site_uv" class="foot-count"></span>位访客
+			</span>
+		</div>
+    </div>
+</footer>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'wesley-icarus'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

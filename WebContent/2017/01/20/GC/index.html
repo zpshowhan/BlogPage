@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta name="baidu-site-verification" content="lKl7jYajUz" />
+    <meta charset="utf-8">
+    
+    <title>JAVA垃圾回收机制 | 迷失的男孩</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="keywords" content="火龙战士,zhengweishan,郑伟山的博客，bolg,博客">
+    <meta name="description" content="概述说起垃圾回收(Garbage Collection，GC)，大家肯定很自然的和java联系起来。在Java中，程序员不需要去关心内存动态分配和垃圾回收的问题，这一切都交给了JVM来处理。顾名思义，垃圾回收就是释放垃圾占用的空间。（Java中指对象所占用的内存在对象不再使用后会自动被回收,是由一个叫垃圾回收器Garbage Collector的进程完成的）
+对象引用Java 中的垃圾回收一般是在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JAVA垃圾回收机制">
+<meta property="og:url" content="http://zhengweishan.oschina.io/2017/01/20/GC/index.html">
+<meta property="og:site_name" content="迷失的男孩">
+<meta property="og:description" content="概述说起垃圾回收(Garbage Collection，GC)，大家肯定很自然的和java联系起来。在Java中，程序员不需要去关心内存动态分配和垃圾回收的问题，这一切都交给了JVM来处理。顾名思义，垃圾回收就是释放垃圾占用的空间。（Java中指对象所占用的内存在对象不再使用后会自动被回收,是由一个叫垃圾回收器Garbage Collector的进程完成的）
+对象引用Java 中的垃圾回收一般是在">
+<meta property="og:image" content="http://i.imgur.com/V9yWtq0.jpg">
+<meta property="og:image" content="http://i.imgur.com/uPY2pBr.jpg">
+<meta property="og:image" content="http://i.imgur.com/3eLa8Pu.jpg">
+<meta property="og:image" content="http://i.imgur.com/lBfc4zv.jpg">
+<meta property="og:image" content="http://i.imgur.com/E9vdNra.png">
+<meta property="og:image" content="http://i.imgur.com/PjEPS71.png">
+<meta property="og:image" content="http://i.imgur.com/2hF6IMJ.png">
+<meta property="og:image" content="http://i.imgur.com/wqycqUI.png">
+<meta property="og:image" content="http://i.imgur.com/HHzDroj.png">
+<meta property="og:image" content="http://i.imgur.com/77DA1WJ.png">
+<meta property="og:image" content="http://i.imgur.com/TJiwRJs.png">
+<meta property="og:updated_time" content="2017-01-20T07:24:09.566Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JAVA垃圾回收机制">
+<meta name="twitter:description" content="概述说起垃圾回收(Garbage Collection，GC)，大家肯定很自然的和java联系起来。在Java中，程序员不需要去关心内存动态分配和垃圾回收的问题，这一切都交给了JVM来处理。顾名思义，垃圾回收就是释放垃圾占用的空间。（Java中指对象所占用的内存在对象不再使用后会自动被回收,是由一个叫垃圾回收器Garbage Collector的进程完成的）
+对象引用Java 中的垃圾回收一般是在">
+<meta name="twitter:image" content="http://i.imgur.com/V9yWtq0.jpg">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="迷失的男孩" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/favicon.ico" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="alternate stylesheet" href="http://cdn.bootcss.com/highlight.js/8.0/styles/monokai_sublime.min.css" title="highlight" />
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?eb23f1849f20e62c924d275e4edef134";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">迷失的男孩</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpg" />
+            <h2 id="name">迷失的男孩</h2>
+            <h3 id="title">为API生，为框架死，为debug奋斗一辈子，吃符号亏，上大小写的当，最后死在需求上。</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>中国, 北京</span>
+            <a id="follow" target="_blank" href="https://github.com/wesley5201314">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                25
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                13
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/wesley5201314" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://git.oschina.net/zhengweishan" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/css/images/weixin.png" target="_blank" title="weixin" class=tooltip>
+                            <i class="fa fa-weixin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="http://weibo.com/wesley5201314" target="_blank" title="weibo" class=tooltip>
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+        <div class="base-info" style="text-align:center">
+        <span style="color:#38b7ea">今天是：
+                 <script type="text/javascript">
+                　　today=new Date(); 
+                    var tdate,tday, x,year; 
+                    var x = new Array("星期日", "星期一", "星期二", "星期三", "星期四", "星期五","星期六");
+                　　var MSIE=navigator.userAgent.indexOf("MSIE");
+                    if(MSIE != -1)
+                    　year =(today.getFullYear());
+                    else
+                    　year = (today.getYear()+1900);
+                    　tdate= year+ "年" + (today.getMonth() + 1 ) + "月" + today.getDate() + "日" + " " + x[today.getDay()];
+                    　document.write(tdate); 
+                </script>
+        </span> 
+        </div>
+        <div class="base-info" style="text-align:center">
+                <span style="color:#38b7ea;"><script type="text/javascript">
+                    today=new Date();
+                    var day; var date; var hello;
+                    hour=new Date().getHours()
+                    if(hour < 6)hello='  凌晨好! '
+                    else if(hour < 9)hello=' 早上好! '
+                    else if(hour < 12)hello=' 上午好! '
+                    else if(hour < 14)hello=' 中午好! '
+                    else if(hour < 17)hello=' 下午好! '
+                    else if(hour < 19)hello=' 傍晚好! '
+                    else if(hour < 22)hello=' 晚上好! '
+                    else {hello='夜深了! '}
+                    var webUrl = webUrl;
+                    document.write(' '+hello);
+                </script>
+                </span>
+            <span id="busuanzi_container_site_uv">
+                您是本站第<span id="busuanzi_value_site_uv" class="foot-count"></span>位访客
+            </span>
+        </div>
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-GC" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            JAVA垃圾回收机制
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/01/20/GC/">
+            <time datetime="2017-01-19T16:00:00.000Z" itemprop="datePublished">2017-01-20</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/JVM/">JVM</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/GC/">GC</a>, <a class="tag-link" href="/tags/JAVA/">JAVA</a>, <a class="tag-link" href="/tags/JVM/">JVM</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>说起垃圾回收(Garbage Collection，GC)，大家肯定很自然的和java联系起来。在Java中，程序员不需要去关心内存动态分配和垃圾回收的问题，这一切都交给了JVM来处理。顾名思义，垃圾回收就是释放垃圾占用的空间。（Java中指对象所占用的内存在对象不再使用后会自动被回收,是由一个叫垃圾回收器Garbage Collector的进程完成的）</p>
+<h2 id="对象引用"><a href="#对象引用" class="headerlink" title="对象引用"></a>对象引用</h2><p>Java 中的垃圾回收一般是在 Java 堆中进行，因为堆中几乎存放了 Java 中所有的对象实例。谈到 Java 堆中的垃圾回收，自然要谈到引用。<br>在 JDK1.2 之前，Java 中的引用定义很很纯粹：如果 reference 类型的数据中存储的数值代表的是另外一块内存的起始地址，就称这块内存代表着一个引用。但在 JDK1.2 之后，Java 对引用的概念进行了扩充，将其分为强引用（Strong Reference）、软引用（Soft Reference）、弱引用（Weak Reference）、虚引用（Phantom Reference）四种，引用强度依次减弱。</p>
+<ul>
+<li>强引用：如“Object obj = new Object（）”，这类引用是 Java 程序中最普遍的。只要强引用还存在，垃圾收集器就永远不会回收掉被引用的对象。</li>
+<li>软引用：它用来描述一些可能还有用，但并非必须的对象。在系统内存不够用时，这类引用关联的对象将被垃圾收集器回收。JDK1.2 之后提供了 SoftReference 类来实现软引用。</li>
+<li>弱引用：它也是用来描述非需对象的，但它的强度比软引用更弱些，被弱引用关联的对象只能生存岛下一次垃圾收集发生之前。当垃圾收集器工作时，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。在 JDK1.2 之后，提供了 WeakReference 类来实现弱引用。</li>
+<li>虚引用：最弱的一种引用关系，完全不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例。为一个对象设置虚引用关联的唯一目的是希望能在这个对象被收集器回收时收到一个系统通知。JDK1.2 之后提供了 PhantomReference 类来实现虚引用。<a id="more"></a></li>
+</ul>
+<h2 id="垃圾对象的判定"><a href="#垃圾对象的判定" class="headerlink" title="垃圾对象的判定"></a>垃圾对象的判定</h2><p>Java 堆中存放着几乎所有的对象实例，GC通过确定对象是否被活动对象引用来确定是否收集该对象。GC首先要判断该对象是否是时候可以收集，两种常用的方法是引用计数和对象引用遍历。</p>
+<blockquote>
+<p>引用计数收集器</p>
+</blockquote>
+<p>引用计数是垃圾收集器中的早期策略。在这种方法中，堆中每个对象（不是引用）都有一个引用计数。当一个对象被创建时，且将该对象分配给一个变量，该变量计数设置为1。当任何其它变量被赋值为这个对象的引用时，计数加1（a = b,则b引用的对象+1），但当一个对象的某个引用超过了生命周期或者被设置为一个新值时，对象的引用计数减1。任何引用计数为0的对象可以被当作垃圾收集。当一个对象被垃圾收集时，它引用的任何对象计数减1。</p>
+<p>优点：引用计数收集器可以很快的执行，交织在程序运行中。对程序不被长时间打断的实时环境比较有利。</p>
+<p>缺点： 无法检测出循环引用。如父对象有一个对子对象的引用，子对象反过来引用父对象。这样，他们的引用计数永远不可能为0</p>
+<blockquote>
+<p>根搜索收集器</p>
+</blockquote>
+<p>Java 和 C# 中都是采用根搜索算法来判定对象是否存活的。这种算法的基本思路是通过一系列名为“GC Roots”的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径称为引用链，当一个对象到 GC Roots 没有任何引用链相连时，就证明此对象是不可用的。在 Java 语言里，可作为 GC Roots 的兑现包括下面几种：</p>
+<ul>
+<li>虚拟机栈（栈帧中的本地变量表）中引用的对象。</li>
+<li>方法区中的类静态属性引用的对象。</li>
+<li>方法区中的常量引用的对象。</li>
+<li>本地方法栈中 JNI（Native 方法）的引用对象。</li>
+</ul>
+<p>实际上，在根搜索算法中，要真正宣告一个对象死亡，至少要经历两次标记过程：如果对象在进行根搜索后发现没有与 GC Roots 相连接的引用链，那它会被第一次标记并且进行一次筛选，筛选的条件是此对象是否有必要执行 finalize()方法。当对象没有覆盖 finalize()方法，或 finalize()方法已经被虚拟机调用过，虚拟机将这两种情况都视为没有必要执行。如果该对象被判定为有必要执行 finalize()方法，那么这个对象将会被放置在一个名为 F-Queue 队列中，并在稍后由一条由虚拟机自动建立的、低优先级的 Finalizer 线程去执行 finalize()方法。finalize()方法是对象逃脱死亡命运的最后一次机会（因为一个对象的 finalize()方法最多只会被系统自动调用一次），稍后 GC 将对 F-Queue 中的对象进行第二次小规模的标记，如果要在 finalize()方法中成功拯救自己，只要在 finalize()方法中让该对象重引用链上的任何一个对象建立关联即可。而如果对象这时还没有关联到任何链上的引用，那它就会被回收掉。</p>
+<blockquote>
+<p>跟踪收集器</p>
+</blockquote>
+<p>早期的JVM使用引用计数，现在大多数JVM采用对象引用遍历。对象引用遍历从一组对象开始，沿着整个对象图上的每条链接，递归确定可到达（reachable）的对象。如果某对象不能从这些根对象的一个（至少一个）到达，则将它作为垃圾收集。在对象遍历阶段，GC必须记住哪些对象可以到达，以便删除不可到达的对象，这称为标记（marking）对象。</p>
+<p>下一步，GC要删除不可到达的对象。删除时，有些GC只是简单的扫描堆栈，删除未标记的未标记的对象，并释放它们的内存以生成新的对象，这叫做清除（sweeping）。这种方法的问题在于内存会分成好多小段，而它们不足以用于新的对象，但是组合起来却很大。因此，许多GC可以重新组织内存中的对象，并进行压缩（compact），形成可利用的空间。</p>
+<p>为此，GC需要停止其他的活动活动。这种方法意味着所有与应用程序相关的工作停止，只有GC运行。结果，在响应期间增减了许多混杂请求。另外，更复杂的 GC不断增加或同时运行以减少或者清除应用程序的中断。有的GC使用单线程完成这项工作，有的则采用多线程以增加效率。</p>
+<h2 id="常用的垃圾收集算法"><a href="#常用的垃圾收集算法" class="headerlink" title="常用的垃圾收集算法"></a>常用的垃圾收集算法</h2><blockquote>
+<p>（1）Mark-Sweep（标记-清除）算法</p>
+</blockquote>
+<p>标记—清除算法是最基础的收集算法，它分为“标记”和“清除”两个阶段：首先标记出所需回收的对象，在标记完成后统一回收掉所有被标记的对象，它的标记过程其实就是前面的根搜索算法中判定垃圾对象的标记过程。标记—清除算法的执行情况如下图所示：</p>
+<p><img src="http://i.imgur.com/V9yWtq0.jpg" alt=""></p>
+<blockquote>
+<p>（2）Copying（复制）算法</p>
+</blockquote>
+<p>为了解决Mark-Sweep算法的缺陷，Copying算法就被提了出来，该算法的提出是为了克服句柄的开销和解决堆碎片的垃圾回收。它开始时把堆分成 一个对象 面和多个空闲面， 程序从对象面为对象分配空间，当对象满了，基于copying算法的垃圾 收集就从根集中扫描活动对象，并将每个 活动对象复制到空闲面(使得活动对象所占的内存之间没有空闲洞)，这样空闲面变成了对象面，原来的对象面变成了空闲面，程序会在新的对象面中分配内存。一种典型的基于coping算法的垃圾回收是stop-and-copy算法，它将堆分成对象面和空闲区域面，在对象面与空闲区域面的切换过程中，程序暂停执行。具体过程如下图所示：</p>
+<p><img src="http://i.imgur.com/uPY2pBr.jpg" alt=""></p>
+<blockquote>
+<p>（3）Mark-Compact（标记-整理）算法</p>
+</blockquote>
+<p>该算法标记的过程与标记—清除算法中的标记过程一样，但对标记后出的垃圾对象的处理情况有所不同，它不是直接对可回收对象进行清理，而是让所有的对象都向一端移动，然后直接清理掉端边界以外的内存。标记—整理算法的回收情况如下所示：</p>
+<p><img src="http://i.imgur.com/3eLa8Pu.jpg" alt=""></p>
+<blockquote>
+<p>(4)Generational Collection（分代收集）算法</p>
+</blockquote>
+<p>分代收集算法是目前大部分JVM的垃圾收集器采用的算法。它的核心思想是根据对象存活的生命周期将内存划分为若干个不同的区域。一般情况下将堆区划分为老年代（Tenured Generation）和新生代（Young Generation），老年代的特点是每次垃圾收集时只有少量对象需要被回收，而新生代的特点是每次垃圾回收时都有大量的对象需要被回收，那么就可以根据不同代的特点采取最适合的收集算法。</p>
+<p>目前大部分垃圾收集器对于新生代都采取Copying算法，因为新生代中每次垃圾回收都要回收大部分对象，也就是说需要复制的操作次数较少，但是实际中并不是按照1：1的比例来划分新生代的空间的，一般来说是将新生代划分为一块较大的Eden空间和两块较小的Survivor空间，每次使用Eden空间和其中的一块Survivor空间，当进行回收时，将Eden和Survivor中还存活的对象复制到另一块Survivor空间中，然后清理掉Eden和刚才使用过的Survivor空间。</p>
+<p>而由于老年代的特点是每次回收都只回收少量对象，一般使用的是Mark-Compact算法。大致流程如下图：</p>
+<p><img src="http://i.imgur.com/lBfc4zv.jpg" alt=""></p>
+<h2 id="常用的垃圾收集器"><a href="#常用的垃圾收集器" class="headerlink" title="常用的垃圾收集器"></a>常用的垃圾收集器</h2><p>垃圾收集器是内存回收算法的具体实现，Java 虚拟机规范中对垃圾收集器应该如何实现并没有任何规定，因此不同厂商、不同版本的虚拟机所提供的垃圾收集器都可能会有很大的差别。下面介绍一下HotSpot（JDK 7)虚拟机提供的几种垃圾收集器，用户可以根据自己的需求组合出各个年代使用的收集器。</p>
+<blockquote>
+<p>1.Serial/Serial Old</p>
+</blockquote>
+<p>Serial/Serial Old收集器是最基本最古老的收集器，它是一个单线程收集器，并且在它进行垃圾收集时，必须暂停所有用户线程。Serial收集器是针对新生代的收集器，采用的是Copying算法，Serial Old收集器是针对老年代的收集器，采用的是Mark-Compact算法。它的优点是实现简单高效，但是缺点是会给用户带来停顿。</p>
+<blockquote>
+<p>2.ParNew</p>
+</blockquote>
+<p>ParNew收集器是Serial收集器的多线程版本，使用多个线程进行垃圾收集。</p>
+<blockquote>
+<p>3.Parallel Scavenge</p>
+</blockquote>
+<p>Parallel Scavenge收集器是一个新生代的多线程收集器（并行收集器），它在回收期间不需要暂停其他用户线程，其采用的是Copying算法，该收集器与前两个收集器有所不同，它主要是为了达到一个可控的吞吐量。</p>
+<blockquote>
+<p>4.Parallel Old</p>
+</blockquote>
+<p>Parallel Old是Parallel Scavenge收集器的老年代版本（并行收集器），使用多线程和Mark-Compact算法。</p>
+<blockquote>
+<p>5.CMS</p>
+</blockquote>
+<p>CMS（Current Mark Sweep）收集器是一种以获取最短回收停顿时间为目标的收集器，它是一种并发收集器，采用的是Mark-Sweep算法。</p>
+<blockquote>
+<p>6.G1</p>
+</blockquote>
+<p>G1收集器是当今收集器技术发展最前沿的成果，它是一款面向服务端应用的收集器，它能充分利用多CPU、多核环境。因此它是一款并行与并发收集器，并且它能建立可预测的停顿时间模型。</p>
+<p><strong><em>新生代收集器使用的收集器：Serial、PraNew、Parallel Scavenge 老年代收集器使用的收集器：Serial Old、Parallel Old、CMS</em></strong></p>
+<p>分代的垃圾回收策略，是基于这样一个事实：不同的对象的生命周期是不一样的。因此，不同生命周期的对象可以采取不同的回收算法，以便提高回收效率。</p>
+<blockquote>
+<p>年轻代（Young Generation）</p>
+</blockquote>
+<p>　　1.所有新生成的对象首先都是放在年轻代的。年轻代的目标就是尽可能快速的收集掉那些生命周期短的对象。</p>
+<p>　　2.新生代内存按照8:1:1的比例分为一个eden区和两个survivor(survivor0,survivor1)区。一个Eden区，两个 Survivor区(一般而言)。大部分对象在Eden区中生成。回收时先将eden区存活对象复制到一个survivor0区，然后清空eden区，当这个survivor0区也存放满了时，则将eden区和survivor0区存活对象复制到另一个survivor1区，然后清空eden和这个survivor0区，此时survivor0区是空的，然后将survivor0区和survivor1区交换，即保持survivor1区为空， 如此往复。</p>
+<p>　　3.当survivor1区不足以存放 eden和survivor0的存活对象时，就将存活对象直接存放到老年代。若是老年代也满了就会触发一次Full GC，也就是新生代、老年代都进行回收</p>
+<p>　　4.新生代发生的GC也叫做Minor GC，MinorGC发生频率比较高(不一定等Eden区满了才触发)</p>
+<blockquote>
+<p>年老代（Old Generation）</p>
+</blockquote>
+<p>　　1.在年轻代中经历了N次垃圾回收后仍然存活的对象，就会被放到年老代中。因此，可以认为年老代中存放的都是一些生命周期较长的对象。</p>
+<p>　　2.内存比新生代也大很多(大概比例是1:2)，当老年代内存满时触发Major GC即Full GC，Full GC发生频率比较低，老年代对象存活时间比较长，存活率标记高。</p>
+<blockquote>
+<p>持久代（Permanent Generation）</p>
+</blockquote>
+<p>　　用于存放静态文件，如Java类、方法等。持久代对垃圾回收没有显著影响，但是有些应用可能动态生成或者调用一些class，例如Hibernate 等，在这种时候需要设置一个比较大的持久代空间来存放这些运行过程中新增的类。</p>
+<p>对垃圾回收策略说明以下两点：</p>
+<ul>
+<li>新生代 GC（Minor GC）：发生在新生代的垃圾收集动作，因为 Java 对象大多都具有朝生夕灭的特性，因此Minor GC 非常频繁，一般回收速度也比较快。</li>
+<li>老年代 GC（Major GC/Full GC）：发生在老年代的 GC，出现了 Major GC，经常会伴随至少一次 Minor GC。由于老年代中的对象生命周期比较长，因此 Major GC 并不频繁，一般都是等待老年代满了后才进行 Full GC，而且其速度一般会比 Minor GC 慢 10 倍以上。另外，如果分配了 Direct Memory，在老年代中进行 Full GC时，会顺便清理掉 Direct Memory 中的废弃对象。</li>
+</ul>
+<h2 id="GC的执行机制"><a href="#GC的执行机制" class="headerlink" title="GC的执行机制"></a>GC的执行机制</h2><p>由于对象进行了分代处理，因此垃圾回收区域、时间也不一样。GC有两种类型：Scavenge GC和Full GC。</p>
+<blockquote>
+<p>Scavenge GC</p>
+</blockquote>
+<p>一般情况下，当新对象生成，并且在Eden申请空间失败时，就会触发Scavenge GC，对Eden区域进行GC，清除非存活对象，并且把尚且存活的对象移动到Survivor区。然后整理Survivor的两个区。这种方式的GC是对年轻代的Eden区进行，不会影响到年老代。因为大部分对象都是从Eden区开始的，同时Eden区不会分配的很大，所以Eden区的GC会频繁进行。因而，一般在这里需要使用速度快、效率高的算法，使Eden去能尽快空闲出来。</p>
+<blockquote>
+<p>Full GC</p>
+</blockquote>
+<p>对整个堆进行整理，包括Young、Tenured和Perm。Full GC因为需要对整个堆进行回收，所以比Scavenge GC要慢，因此应该尽可能减少Full GC的次数。在对JVM调优的过程中，很大一部分工作就是对于FullGC的调节。有如下原因可能导致Full GC：</p>
+<p>　　1.年老代（Tenured）被写满</p>
+<p>　　2.持久代（Perm）被写满 </p>
+<p>　　3.System.gc()被显示调用 </p>
+<p>　　4.上一次GC之后Heap的各域分配策略动态变化</p>
+<h2 id="详解分代垃圾回收"><a href="#详解分代垃圾回收" class="headerlink" title="详解分代垃圾回收"></a>详解分代垃圾回收</h2><p>在JVM中，内存是按照分代进行组织的。</p>
+<p><img src="http://i.imgur.com/E9vdNra.png" alt=""></p>
+<p>其中，堆内存分为年轻代和年老代，非堆内存主要是Permanent区域，主要用于存储一些类的元数据，常量池等信息。而年轻代又分为两种，一种是Eden区域，另外一种是两个大小对等的Survivor区域。之所以将Java内存按照分代进行组织，主要是基于这样一个“弱假设” - 大多数对象都在年轻时候死亡。同时，将内存按照分代进行组织，使得我们可以在不同的分代上使用不同的垃圾回收算法，使得整个内存的垃圾回收更加有效。</p>
+<blockquote>
+<p>年轻代的垃圾回收</p>
+</blockquote>
+<p>具体流程如下：</p>
+<p><img src="http://i.imgur.com/PjEPS71.png" alt=""></p>
+<p>在年轻代上采用的垃圾回收算法是“Mark-Copy”算法，并不同于我们前面所了解的任何一种基本垃圾回收算法，但是Mark算法是一样的，基于根对象找到所有的可达对象，具体可看Mark-Sweep算法中的Mark步骤. 而对于Copy算法，它仅仅是简单的将符合一定年龄的对象从一个分代拷贝到另一个分代。</p>
+<p>首先，新对象的内存分配都是先在Eden区域中进行的，当Eden区域的空间不足于分配新对象时，就会触发年轻代上的垃圾回收（发生在Eden和Survivor内存区域上），我们称之为”minor garbage collection”.同时，每个对象都有一个“年龄”，这个年龄实际上指的就是该对象经历过的minor gc的次数。如图1所示，当对象刚分配到Eden区域时，对象的年龄为“0”，当minor gc被触发后，所有存活的对象（仍然可达对象）会被拷贝到其中一个Survivor区域，同时年龄增长为“1”。并清除整个Eden内存区域中的非可达对象。</p>
+<p>当第二次minor gc被触发时（如图2所示），JVM会通过Mark算法找出所有在Eden内存区域和Survivor1内存区域存活的对象，并将他们拷贝到新的Survivor2内存区域(这也就是为什么需要两个大小一样的Survivor区域的原因)，同时对象的年龄加1. 最后，清除所有在Eden内存区域和Survivor1内存区域的非可达对象。</p>
+<p>当对象的年龄足够大（这个年龄可以通过JVM参数进行指定，这里假定是2），当minor gc再次发生时，它会从Survivor内存区域中升级到年老代中，如图3所示。</p>
+<p>其实，即使对象的年龄不够大，但是Survivor内存区域中没有足够的空间来容纳从Eden升级过来的对象时，也会有部分对象直接升级到Tenured内存区域中。</p>
+<blockquote>
+<p>年老代的垃圾回收</p>
+</blockquote>
+<p>具体流程如下：</p>
+<p>当minor gc发生时，又有对象从Survivor区域升级到Tenured区域，但是Tenured区域已经没有空间容纳新的对象了，那么这个时候就会触发年老代上的垃圾回收，我们称之为”major garbage collection”.</p>
+<p>而在年老代上选择的垃圾回收算法则取决于JVM上采用的是什么垃圾回收器。通过的垃圾回收器有两种：Parallel Scavenge(PS) 和Concurrent Mark Sweep(CMS)。这两种垃圾回收器的不同更多的是体现在年老代的垃圾回收过程中，年轻代的垃圾回收过程在这两种垃圾回收器中基本上是一致的。就像其名字所表示的那样，Parallel Scavenge垃圾回收器在执行垃圾回收时使用了多线程来一起进行垃圾回收，这样可以提高垃圾回收的效率。而Concurrent Mark Sweep垃圾回收器在进行垃圾回收时，应用程序可以同时运行。</p>
+<p>PS垃圾回收器在年老代上采用的垃圾回收算法可以看作是标记-清除算法和标记-压缩算法的结合体。</p>
+<p>首先，PS垃圾回收器先是会在年老代上使用标记-清除算法来回收掉非可达对象所占有的空间，但是我们知道，标记清除算法的一个缺陷就是它会引起内存碎片问题。继而有可能会引发连续的major gc。假设当前存在的内存碎片有10M，但最大的内存碎片只能容纳2M的对象，这个时候如果有一个3M的对象从Survivor区域升级到Tenured区域，那Tenured区域也没有办法存放这个3M的对象。结果就是不断的触发major gc，直到Out of Memory。所以，PS垃圾回收器在清除非可达对象后，还会进行一次compact，来消除内存碎片。如下图：</p>
+<p><img src="http://i.imgur.com/2hF6IMJ.png" alt=""></p>
+<p>CMS垃圾收集器相比于PS垃圾收集器，它成功的减少了垃圾收集时暂停应用程序的时间，因为CMS在进行垃圾收集时，应用程序是可以并行运行的。下面让我们来看看它是怎么做到的。</p>
+<p>从它的名字可以看出，CMS垃圾收集器在年老代上采用的垃圾回收算法是标记-清除算法。但是，它跟标准的标记-清除算法略有不同。它主要分为四个阶段：</p>
+<ol>
+<li><strong>Initial Mark阶段</strong> - 这个阶段是Stop-The-World的，它会暂停应用程序的运行，但是在这里阶段，它不会标记出在Tenured区域中所有的可达对象。它只会从根对象开始出发，标记到根对象的第一层孩子节点即停止。然后恢复应用程序的运行。所以，这个暂停应用程序的时间是很短的。</li>
+<li><strong>Concurrent Mark阶段</strong> - 在这个阶段中，CMS垃圾回收器以Initial Mark阶段标记的节点为根对象，重新开始标记Tenured区域中的可达对象。当然，在这个阶段中是不需要暂停应用程序的。这也是它称为”Concurrent Mark”的原因。这同时也造成了一个问题，那就是由于CMS垃圾回收器和应用程序同时运行，Concurrent Mark阶段它并不保证在Tenured区域的可达对象都被标记了 - 应用程序一直在分配新对象。</li>
+<li><strong>Remark阶段</strong> - 由于Concurrent Mark阶段它并不保证在Tenured区域的可达对象都被标记了，所以我们需要再次暂停应用程序，确保所有的可达对象都被标记。为了加快速度，这里也采用了多线程来同时标记可达对象。</li>
+<li><strong>Concurrent Sweep阶段</strong> - 最后，恢复应用程序的执行，同时CMS执行sweep，来清除所有非可达对象所占用的内存空间。</li>
+</ol>
+<p>一张图看他们的区别：</p>
+<p><img src="http://i.imgur.com/wqycqUI.png" alt=""></p>
+<p>黑色箭头代表应用程序的运行，绿色箭头代表CMS垃圾收集器的运行。一根线条表示单线程，多个线条表示多线程。</p>
+<p>所以，相比于PS垃圾收集器，CMS垃圾收集器成功的减少了应用程序暂时的时间。但是很不幸的是，CMS垃圾收集器虽然减少了暂停应用程序的运行时间，但是由于它没有Compact阶段，它还是存在着内存碎片问题。于是，为了去除内存碎片问题，同时又保留CMS垃圾收集器低暂停时间的优点，JAVA7发布了一个新的垃圾收集器 - G1垃圾收集器。它会在未来逐步替换掉CMS垃圾收集器。</p>
+<h2 id="Garbage-First-G1-垃圾收集器（JDK7）"><a href="#Garbage-First-G1-垃圾收集器（JDK7）" class="headerlink" title="Garbage First(G1)垃圾收集器（JDK7）"></a>Garbage First(G1)垃圾收集器（JDK7）</h2><p>G1垃圾收集器和CMS垃圾收集器有几点不同。首先，最大的不同是内存的组织方式变了。Eden，Survivor和Tenured等内存区域不再是连续的了，而是变成了一个个大小一样的region - 每个region从1M到32M不等。</p>
+<p><img src="http://i.imgur.com/HHzDroj.png" alt=""></p>
+<p>一个region有可能属于Eden，Survivor或者Tenured内存区域。图中的E表示该region属于Eden内存区域，S表示属于Survivor内存区域，T表示属于Tenured内存区域。图中空白的表示未使用的内存空间。G1垃圾收集器还增加了一种新的内存区域，叫做Humongous内存区域，如图中的H块。这种内存区域主要用于存储大对象-即大小超过一个region大小的50%的对象。</p>
+<p>在G1垃圾收集器中，年轻代的垃圾回收过程跟PS垃圾收集器和CMS垃圾收集器差不多，新对象的分配还是在Eden region中，当所有Eden region的大小超过某个值时，触发minor gc，回收Eden region和Survivor region上的非可达对象，同时升级存活的可达对象到对应的Survivor region和Tenured region上。对象从Survivor region升级到Tenured region依然是取决于对象的年龄。</p>
+<p><img src="http://i.imgur.com/77DA1WJ.png" alt=""></p>
+<p>对于年老代上的垃圾收集，G1垃圾收集器也分为4个阶段，基本跟CMS垃圾收集器一样，但略有不同：</p>
+<ol>
+<li><strong>Initial Mark阶段</strong> - 同CMS垃圾收集器的Initial Mark阶段一样，G1也需要暂停应用程序的执行，它会标记从根对象出发，在根对象的第一层孩子节点中标记所有可达的对象。但是G1的垃圾收集器的Initial Mark阶段是跟minor gc一同发生的。也就是说，在G1中，你不用像在CMS那样，单独暂停应用程序的执行来运行Initial Mark阶段，而是在G1触发minor gc的时候一并将年老代上的Initial Mark给做了。</li>
+<li><strong>Concurrent Mark阶段</strong> - 在这个阶段G1做的事情跟CMS一样。但G1同时还多做了一件事情，那就是，如果在Concurrent Mark阶段中，发现哪些Tenured region中对象的存活率很小或者基本没有对象存活，那么G1就会在这个阶段将其回收掉，而不用等到后面的clean up阶段。这也是Garbage First名字的由来。同时，在该阶段，G1会计算每个 region的对象存活率，方便后面的clean up阶段使用 。</li>
+<li><strong>Remark阶段</strong> - 在这个阶段G1做的事情跟CMS一样, 但是采用的算法不同，G1采用一种叫做SATB(snapshot-at-the-begining)的算法能够在Remark阶段更快的标记可达对象。</li>
+<li><strong>Clean up/Copy阶段</strong> - 在G1中，没有CMS中对应的Sweep阶段。相反 它有一个Clean up/Copy阶段，在这个阶段中,G1会挑选出那些对象存活率低的region进行回收，这个阶段也是和minor gc一同发生的,如下图所示：<br><img src="http://i.imgur.com/TJiwRJs.png" alt=""></li>
+</ol>
+<p>从上可以看到，由于<strong>Initial Mark阶段</strong>和<strong>Clean up/Copy阶段</strong>都是跟minor gc同时发生的，相比于CMS，G1暂停应用程序的时间更少，从而提高了垃圾回收的效率。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://zhengweishan.oschina.io/2017/01/20/GC/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://zhengweishan.oschina.io/2017/01/20/GC/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/01/20/jvm/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    JVM简介及工作原理分析
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/01/19/es2/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">ElasticSearch JAVA API基础学习------Elasticsearch学习（二）</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2017/01/20/GC/" data-title="JAVA垃圾回收机制" data-url="http://zhengweishan.oschina.io/2017/01/20/GC/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/27/CountDownLatch/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/并发/">并发</a></p>
+                            <p class="item-title"><a href="/2017/03/27/CountDownLatch/" class="title">java并发包里的CountDownLatch的用法</a></p>
+                            <p class="item-date"><time datetime="2017-03-26T16:00:00.000Z" itemprop="datePublished">2017-03-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/24/spring-boot-demo/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/SpringBoot/">SpringBoot</a></p>
+                            <p class="item-title"><a href="/2017/03/24/spring-boot-demo/" class="title">spring boot + mybatis + quartz + druid + swagger2</a></p>
+                            <p class="item-date"><time datetime="2017-03-23T16:00:00.000Z" itemprop="datePublished">2017-03-24</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/23/boy-rpc-framework/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/rpc/">rpc</a></p>
+                            <p class="item-title"><a href="/2017/03/23/boy-rpc-framework/" class="title">分布式rpc框架</a></p>
+                            <p class="item-date"><time datetime="2017-03-22T16:00:00.000Z" itemprop="datePublished">2017-03-23</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/02/10/（六）Tomcat_7.0.70生命周期管理/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a></p>
+                            <p class="item-title"><a href="/2017/02/10/（六）Tomcat_7.0.70生命周期管理/" class="title">Tomcat源码学习（六）--Tomcat_7.0.70 生命周期管理</a></p>
+                            <p class="item-date"><time datetime="2017-02-09T16:00:00.000Z" itemprop="datePublished">2017-02-10</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/02/09/（五）Tomcat_7.0.70类加载体系/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Tomcat源码/">Tomcat源码</a></p>
+                            <p class="item-title"><a href="/2017/02/09/（五）Tomcat_7.0.70类加载体系/" class="title">Tomcat源码学习（五）-- Tomcat_7.0.70 类加载体系分析</a></p>
+                            <p class="item-date"><time datetime="2017-02-08T16:00:00.000Z" itemprop="datePublished">2017-02-09</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Elasticsearch/">Elasticsearch</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JMS/">JMS</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JVM/">JVM</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringBoot/">SpringBoot</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tomcat源码/">Tomcat源码</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/kafka/">kafka</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/rpc/">rpc</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/并发/">并发</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/ActiveMQ/" style="font-size: 16.67px;">ActiveMQ</a> <a href="/tags/Elasticsearch学习/" style="font-size: 13.33px;">Elasticsearch学习</a> <a href="/tags/GC/" style="font-size: 13.33px;">GC</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/JAVA/" style="font-size: 16.67px;">JAVA</a> <a href="/tags/JMS/" style="font-size: 16.67px;">JMS</a> <a href="/tags/JVM/" style="font-size: 13.33px;">JVM</a> <a href="/tags/Reflection/" style="font-size: 10px;">Reflection</a> <a href="/tags/SpingBoot/" style="font-size: 10px;">SpingBoot</a> <a href="/tags/kafka/" style="font-size: 16.67px;">kafka</a> <a href="/tags/rpc-分布式/" style="font-size: 10px;">rpc 分布式</a> <a href="/tags/tomcat/" style="font-size: 20px;">tomcat</a> <a href="/tags/并发，CountDownLatch/" style="font-size: 10px;">并发，CountDownLatch</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2017 郑伟山 版权所有<br> 
+            由 <a href="http://hexo.io/" target="_blank">Hexo</a> 强力驱动 &brvbar; 主题 -- <a href="https://github.com/ppoffice/hexo-theme-icarus">Icarus</a><br>
+            
+        </div>
+		<div class="inner">
+        	<span id="busuanzi_container_site_pv">
+    			本站总访问量<span id="busuanzi_value_site_pv" class="foot-count"></span>次
+			</span>
+		</div>
+    </div>
+<script src="http://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+</footer>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'wesley-icarus'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

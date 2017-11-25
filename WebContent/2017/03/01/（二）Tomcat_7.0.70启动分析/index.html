@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta name="baidu-site-verification" content="lKl7jYajUz" />
+    <meta charset="utf-8">
+    
+    <title>迷失的男孩</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="keywords" content="火龙战士,zhengweishan,郑伟山的博客，bolg,博客">
+    <meta name="description" content="Tomcat源码学习（二）–Tomcat_7.0.70 启动分析1、运行Tomcat_7.0.70源码项目build成功后，刷新整个项目，会发现多出一个output目录：
+
+为了让应用跑起来，可以检查一下output\build\conf下是否已经有配置文件，这些文件实际是从项目根路径conf目录下拷贝过来的。
+
+找到BootStarp.java文件，Debug前加入默认的catalina hom">
+<meta property="og:type" content="article">
+<meta property="og:title" content="迷失的男孩">
+<meta property="og:url" content="http://zhengweishan.oschina.io/2017/03/01/（二）Tomcat_7.0.70启动分析/index.html">
+<meta property="og:site_name" content="迷失的男孩">
+<meta property="og:description" content="Tomcat源码学习（二）–Tomcat_7.0.70 启动分析1、运行Tomcat_7.0.70源码项目build成功后，刷新整个项目，会发现多出一个output目录：
+
+为了让应用跑起来，可以检查一下output\build\conf下是否已经有配置文件，这些文件实际是从项目根路径conf目录下拷贝过来的。
+
+找到BootStarp.java文件，Debug前加入默认的catalina hom">
+<meta property="og:image" content="http://i.imgur.com/lEmnktv.png">
+<meta property="og:image" content="http://i.imgur.com/7riC9qx.png">
+<meta property="og:image" content="http://i.imgur.com/vOat4iI.png">
+<meta property="og:image" content="http://i.imgur.com/ac9aXEQ.png">
+<meta property="og:image" content="http://i.imgur.com/KxbTJD8.png">
+<meta property="og:image" content="http://i.imgur.com/XlnUToa.png">
+<meta property="og:updated_time" content="2016-07-01T09:22:18.950Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="迷失的男孩">
+<meta name="twitter:description" content="Tomcat源码学习（二）–Tomcat_7.0.70 启动分析1、运行Tomcat_7.0.70源码项目build成功后，刷新整个项目，会发现多出一个output目录：
+
+为了让应用跑起来，可以检查一下output\build\conf下是否已经有配置文件，这些文件实际是从项目根路径conf目录下拷贝过来的。
+
+找到BootStarp.java文件，Debug前加入默认的catalina hom">
+<meta name="twitter:image" content="http://i.imgur.com/lEmnktv.png">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="迷失的男孩" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/favicon.ico" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?eb23f1849f20e62c924d275e4edef134";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">迷失的男孩</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpg" />
+            <h2 id="name">迷失的男孩</h2>
+            <h3 id="title">为API生，为框架死，为debug奋斗一辈子，吃符号亏，上大小写的当，最后死在需求上。</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>中国, 北京</span>
+            <a id="follow" target="_blank" href="https://github.com/wesley5201314">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                22
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                8
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/wesley5201314" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://git.oschina.net/zhengweishan" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/css/images/weixin.png" target="_blank" title="weixin" class=tooltip>
+                            <i class="fa fa-weixin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="http://weibo.com/wesley5201314" target="_blank" title="weibo" class=tooltip>
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-（二）Tomcat_7.0.70启动分析" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h1 id="Tomcat源码学习（二）–Tomcat-7-0-70-启动分析"><a href="#Tomcat源码学习（二）–Tomcat-7-0-70-启动分析" class="headerlink" title="Tomcat源码学习（二）–Tomcat_7.0.70 启动分析"></a>Tomcat源码学习（二）–Tomcat_7.0.70 启动分析</h1><h2 id="1、运行Tomcat-7-0-70源码"><a href="#1、运行Tomcat-7-0-70源码" class="headerlink" title="1、运行Tomcat_7.0.70源码"></a>1、运行Tomcat_7.0.70源码</h2><p>项目build成功后，刷新整个项目，会发现多出一个output目录：</p>
+<p><img src="http://i.imgur.com/lEmnktv.png" alt=""></p>
+<p>为了让应用跑起来，可以检查一下output\build\conf下是否已经有配置文件，这些文件实际是从项目根路径conf目录下拷贝过来的。</p>
+<p><img src="http://i.imgur.com/7riC9qx.png" alt=""></p>
+<p>找到BootStarp.java文件，Debug前加入默认的catalina home路径作为启动参数。</p>
+<p><img src="http://i.imgur.com/vOat4iI.png" alt=""></p>
+<p>路径设置为output下build的绝对路径。比如我自己的机器设置的值是-Dcatalina.home=”W:\workspace\tc7.0.70\output\build”</p>
+<p><img src="http://i.imgur.com/ac9aXEQ.png" alt=""><br>这样就可以愉快的在文件中加入断点Debug源码分析了。运行之后的效果图：<br><img src="http://i.imgur.com/KxbTJD8.png" alt=""><br><img src="http://i.imgur.com/XlnUToa.png" alt=""><br>OK，源码到此运行成功，完美~</p>
+<h2 id="2、启动分析"><a href="#2、启动分析" class="headerlink" title="2、启动分析"></a>2、启动分析</h2><p>上面运行源码用的BootStarp.java这个类中的main方法（后面再对这个main方法做分析），实际上我们在用Tomcat的时候,大部分都是使用脚本文件startup.sh、startup.bat、shutdown.sh、shutdown.bat等脚本或者批处理命令来启动Tomcat的.大家一定知道改如何使用它，但是它们究竟是如何实现的，下面就一点一点的分析。</p>
+<p>由于在生产环境中，Tomcat一般部署在Linux系统下，所以将以startup.sh和shutdown.sh等shell脚本为准，对Tomcat的启动与停止进行分析。</p>
+<p>Linux下启动Tomcat的命令：</p>
+<pre><code>sh startup.sh
+</code></pre><p>下面将从shell脚本startup.sh开始分析Tomcat的启动过程。</p>
+<p>startup.sh脚本代码清单：</p>
+<pre><code># Better OS/400 detection: see Bugzilla 31132
+os400=false
+case &quot;`uname`&quot; in
+OS400*) os400=true;;
+esac
+
+# resolve links - $0 may be a softlink
+PRG=&quot;$0&quot;
+
+while [ -h &quot;$PRG&quot; ] ; do
+  ls=`ls -ld &quot;$PRG&quot;`
+  link=`expr &quot;$ls&quot; : &apos;.*-&gt; \(.*\)$&apos;`
+  if expr &quot;$link&quot; : &apos;/.*&apos; &gt; /dev/null; then
+PRG=&quot;$link&quot;
+  else
+PRG=`dirname &quot;$PRG&quot;`/&quot;$link&quot;
+  fi
+done
+
+PRGDIR=`dirname &quot;$PRG&quot;`
+EXECUTABLE=catalina.sh
+
+# Check that target executable exists
+if $os400; then
+  # -x will Only work on the os400 if the files are:
+  # 1. owned by the user
+  # 2. owned by the PRIMARY group of the user
+  # this will not work if the user belongs in secondary groups
+  eval
+else
+  if [ ! -x &quot;$PRGDIR&quot;/&quot;$EXECUTABLE&quot; ]; then
+echo &quot;Cannot find $PRGDIR/$EXECUTABLE&quot;
+echo &quot;The file is absent or does not have execute permission&quot;
+echo &quot;This file is needed to run this program&quot;
+exit 1
+  fi
+fi
+
+exec &quot;$PRGDIR&quot;/&quot;$EXECUTABLE&quot; start &quot;$@&quot;
+</code></pre><p>从代码清单可以看出有两个主要的变量，分别是：</p>
+<pre><code>1. PRGDIR：当前shell脚本所在的路径；
+2. EXECUTABLE：脚本catalina.sh。
+</code></pre><p><code>exec &quot;$PRGDIR&quot;/&quot;$EXECUTABLE&quot; start &quot;$@&quot;</code> 我们知道执行了shell脚本catalina.sh，并且传递参数start。</p>
+<p>catalina.sh 脚本代码（部分）清单：</p>
+<pre><code>  shift
+  touch &quot;$CATALINA_OUT&quot;
+  if [ &quot;$1&quot; = &quot;-security&quot; ] ; then
+if [ $have_tty -eq 1 ]; then
+  echo &quot;Using Security Manager&quot;
+fi
+shift
+eval $_NOHUP &quot;\&quot;$_RUNJAVA\&quot;&quot; &quot;\&quot;$LOGGING_CONFIG\&quot;&quot; $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
+  -Djava.endorsed.dirs=&quot;\&quot;$JAVA_ENDORSED_DIRS\&quot;&quot; -classpath &quot;\&quot;$CLASSPATH\&quot;&quot; \
+  -Djava.security.manager \
+  -Djava.security.policy==&quot;\&quot;$CATALINA_BASE/conf/catalina.policy\&quot;&quot; \
+  -Dcatalina.base=&quot;\&quot;$CATALINA_BASE\&quot;&quot; \
+  -Dcatalina.home=&quot;\&quot;$CATALINA_HOME\&quot;&quot; \
+  -Djava.io.tmpdir=&quot;\&quot;$CATALINA_TMPDIR\&quot;&quot; \
+  org.apache.catalina.startup.Bootstrap &quot;$@&quot; start \
+  &gt;&gt; &quot;$CATALINA_OUT&quot; 2&gt;&amp;1 &quot;&amp;&quot;
+
+  else
+eval $_NOHUP &quot;\&quot;$_RUNJAVA\&quot;&quot; &quot;\&quot;$LOGGING_CONFIG\&quot;&quot; $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
+  -Djava.endorsed.dirs=&quot;\&quot;$JAVA_ENDORSED_DIRS\&quot;&quot; -classpath &quot;\&quot;$CLASSPATH\&quot;&quot; \
+  -Dcatalina.base=&quot;\&quot;$CATALINA_BASE\&quot;&quot; \
+  -Dcatalina.home=&quot;\&quot;$CATALINA_HOME\&quot;&quot; \
+  -Djava.io.tmpdir=&quot;\&quot;$CATALINA_TMPDIR\&quot;&quot; \
+  org.apache.catalina.startup.Bootstrap &quot;$@&quot; start \
+  &gt;&gt; &quot;$CATALINA_OUT&quot; 2&gt;&amp;1 &quot;&amp;&quot;
+
+  fi
+
+  if [ ! -z &quot;$CATALINA_PID&quot; ]; then
+echo $! &gt; &quot;$CATALINA_PID&quot;
+  fi
+  echo &quot;Tomcat started.&quot;
+</code></pre><p>从上面可以看出，脚本最终使用java命令执行了org.apache.catalina.startup.Bootstrap类中的main方法，参数也是start。Bootstrap的main方法的实现如下：</p>
+<pre><code>public static void main(String args[]) {
+
+    if (daemon == null) {
+        // Don&apos;t set daemon until init() has completed
+        Bootstrap bootstrap = new Bootstrap();
+        try {
+            bootstrap.init();
+        } catch (Throwable t) {
+            handleThrowable(t);
+            t.printStackTrace();
+            return;
+        }
+        daemon = bootstrap;
+    } else {
+        // When running as a service the call to stop will be on a new
+        // thread so make sure the correct class loader is used to prevent
+        // a range of class not found exceptions.
+        Thread.currentThread().setContextClassLoader(daemon.catalinaLoader);
+    }
+
+    try {
+        String command = &quot;start&quot;;
+        if (args.length &gt; 0) {
+            command = args[args.length - 1];
+        }
+
+        if (command.equals(&quot;startd&quot;)) {
+            args[args.length - 1] = &quot;start&quot;;
+            daemon.load(args);
+            daemon.start();
+        } else if (command.equals(&quot;stopd&quot;)) {
+            args[args.length - 1] = &quot;stop&quot;;
+            daemon.stop();
+        } else if (command.equals(&quot;start&quot;)) {
+            //传递参数为start
+            daemon.setAwait(true);
+            daemon.load(args);
+            daemon.start();
+        } else if (command.equals(&quot;stop&quot;)) {
+            daemon.stopServer(args);
+        } else if (command.equals(&quot;configtest&quot;)) {
+            daemon.load(args);
+            if (null==daemon.getServer()) {
+                System.exit(1);
+            }
+            System.exit(0);
+        } else {
+            log.warn(&quot;Bootstrap: command \&quot;&quot; + command + &quot;\&quot; does not exist.&quot;);
+        }
+    } catch (Throwable t) {
+        // Unwrap the Exception for clearer error reporting
+        if (t instanceof InvocationTargetException &amp;&amp;
+                t.getCause() != null) {
+            t = t.getCause();
+        }
+        handleThrowable(t);
+        t.printStackTrace();
+        System.exit(1);
+    }
+
+}
+</code></pre><p>当传递参数start的时候，command等于start，此时main方法的执行步骤如下：</p>
+<ul>
+<li>初始化Bootstrap</li>
+</ul>
+<pre><code>public void init() throws Exception{
+// Set Catalina path
+setCatalinaHome(); //1.设置Catalina路径，默认为Tomcat的根目录
+setCatalinaBase();
+
+initClassLoaders();//2.初始化Tomcat的类加载器
+
+Thread.currentThread().setContextClassLoader(catalinaLoader);//3.并设置线程上下文类加载器
+
+SecurityClassLoad.securityClassLoad(catalinaLoader);
+
+// Load our startup class and call its process() method
+if (log.isDebugEnabled())
+    log.debug(&quot;Loading startup class&quot;);
+//4.用反射实例化org.apache.catalina.startup.Catalina对象，并且使用反射调用其setParentClassLoader方法，给Catalina对象设置Tomcat类加载体系的顶级加载器（Java自带的三种类加载器除外）
+Class&lt;?&gt; startupClass =
+    catalinaLoader.loadClass
+    (&quot;org.apache.catalina.startup.Catalina&quot;);
+Object startupInstance = startupClass.newInstance();
+
+// Set the shared extensions class loader
+if (log.isDebugEnabled())
+    log.debug(&quot;Setting startup class properties&quot;);
+String methodName = &quot;setParentClassLoader&quot;;
+Class&lt;?&gt; paramTypes[] = new Class[1];
+paramTypes[0] = Class.forName(&quot;java.lang.ClassLoader&quot;);
+Object paramValues[] = new Object[1];
+paramValues[0] = sharedLoader;
+Method method =
+    startupInstance.getClass().getMethod(methodName, paramTypes);
+method.invoke(startupInstance, paramValues);
+
+catalinaDaemon = startupInstance;
+}
+</code></pre><ul>
+<li><p>加载、解析server.xml配置文件</p>
+<p>  当传递参数start的时候，会调用Bootstrap的load方法：</p>
+<pre><code> /**
+ * Load daemon.
+ */
+private void load(String[] arguments)
+    throws Exception {
+
+    // Call the load() method
+    String methodName = &quot;load&quot;;
+    Object param[];
+    Class&lt;?&gt; paramTypes[];
+    if (arguments==null || arguments.length==0) {
+        paramTypes = null;
+        param = null;
+    } else {
+        paramTypes = new Class[1];
+        paramTypes[0] = arguments.getClass();
+        param = new Object[1];
+        param[0] = arguments;
+    }
+    Method method =
+        catalinaDaemon.getClass().getMethod(methodName, paramTypes);//用反射调用catalinaDaemon（类型是Catalina）的load方法加载和解析server.xml配置文件。
+    if (log.isDebugEnabled())
+        log.debug(&quot;Calling startup class &quot; + method);
+    method.invoke(catalinaDaemon, param);
+
+}
+</code></pre><p>备注：如何加载和解析server.xml配置文件，后面会博客会陆续给出。</p>
+</li>
+<li><p>启动Tomcat</p>
+<p>  当传递参数start的时候，调用Bootstrap的load方法之后会接着调用start方法：</p>
+<pre><code>/**
+ * Start the Catalina daemon.
+ */
+public void start()
+    throws Exception {
+    if( catalinaDaemon==null ) init();
+
+    Method method = catalinaDaemon.getClass().getMethod(&quot;start&quot;, (Class [] )null);//启动Tomcat，此方法实际是用反射调用了catalinaDaemon（类型是Catalina）的start方法
+    method.invoke(catalinaDaemon, (Object [])null);
+
+}
+</code></pre><p>Catalina的start方法如下：</p>
+<pre><code>     /**
+ * Start a new server instance.
+ */
+public void start() {
+    //1.验证Server容器是否已经实例化
+    if (getServer() == null) {
+        load(); //如果没有实例化Server容器，还会再次调用Catalina的load方法加载和解析server.xml，这也说明Tomcat只允许Server容器通过配置在server.xml的方式生成，用户也可以自己实现Server接口创建自定义的Server容器以取代默认的StandardServer。
+    }
+
+    if (getServer() == null) {
+        log.fatal(&quot;Cannot start server. Server instance is not configured.&quot;);
+        return;
+    }
+
+    long t1 = System.nanoTime();
+
+    // Start the new server
+    try {
+        getServer().start(); //2.启动Server容器
+    } catch (LifecycleException e) {
+        log.fatal(sm.getString(&quot;catalina.serverStartFail&quot;), e);
+        try {
+            getServer().destroy();
+        } catch (LifecycleException e1) {
+            log.debug(&quot;destroy() failed for failed Server &quot;, e1);
+        }
+        return;
+    }
+
+    long t2 = System.nanoTime();
+    if(log.isInfoEnabled()) {
+        log.info(&quot;Server startup in &quot; + ((t2 - t1) / 1000000) + &quot; ms&quot;);
+    }
+
+    // Register shutdown hook 
+    if (useShutdownHook) {
+        if (shutdownHook == null) {
+            shutdownHook = new CatalinaShutdownHook();//3.设置关闭钩子
+        }
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+        // If JULI is being used, disable JULI&apos;s shutdown hook since
+        // shutdown hooks run in parallel and log messages may be lost
+        // if JULI&apos;s hook completes before the CatalinaShutdownHook()
+        LogManager logManager = LogManager.getLogManager();
+        if (logManager instanceof ClassLoaderLogManager) {
+            ((ClassLoaderLogManager) logManager).setUseShutdownHook(
+                    false);
+        }
+    }
+
+    if (await) {
+        await();//4.最后调用Catalina的await方法循环等待接收Tomcat的shutdown命令
+        stop();//5.如果Tomcat运行正常且没有收到shutdown命令，是不会向下执行此方法的，当接收到shutdown命令，Catalina的await方法会退出循环等待，然后顺序执行stop方法停止Tomcat
+    }
+}
+</code></pre><p>Catalina的await方法实际只是代理执行了Server容器的await方法。</p>
+<pre><code>/**
+ * Await and shutdown.
+ */
+public void await() {
+
+    getServer().await();
+
+}
+</code></pre><p>以Server的默认实现StandardServer为例，其await方法如下：</p>
+<pre><code>@Override
+public void await() {
+    // Negative values - don&apos;t wait on port - tomcat is embedded or we just don&apos;t like ports
+    if( port == -2 ) {
+        // undocumented yet - for embedding apps that are around, alive.
+        return;
+    }
+    if( port==-1 ) {
+        try {
+            awaitThread = Thread.currentThread();
+            while(!stopAwait) {
+                try {
+                    Thread.sleep( 10000 );
+                } catch( InterruptedException ex ) {
+                    // continue and check the flag
+                }
+            }
+        } finally {
+            awaitThread = null;
+        }
+        return;
+    }
+
+    // Set up a server socket to wait on
+    try {
+        awaitSocket = new ServerSocket(port, 1,
+                InetAddress.getByName(address));//创建socket连接的服务端对象ServerSocket
+    } catch (IOException e) {
+        log.error(&quot;StandardServer.await: create[&quot; + address
+                           + &quot;:&quot; + port
+                           + &quot;]: &quot;, e);
+        return;
+    }
+
+    try {
+        awaitThread = Thread.currentThread();
+
+        // Loop waiting for a connection and a valid command
+        while (!stopAwait) {
+            ServerSocket serverSocket = awaitSocket;
+            if (serverSocket == null) {
+                break;
+            }
+
+            // Wait for the next connection
+            Socket socket = null;
+            StringBuilder command = new StringBuilder();//创建一个对象循环接收socket中的字符
+            try {
+                InputStream stream;
+                long acceptStartTime = System.currentTimeMillis();
+                try {
+                    socket = serverSocket.accept();
+                    socket.setSoTimeout(10 * 1000);  // Ten seconds
+                    stream = socket.getInputStream();
+                } catch (SocketTimeoutException ste) {
+                    // This should never happen but bug 56684 suggests that
+                    // it does.
+                    log.warn(sm.getString(&quot;standardServer.accept.timeout&quot;,
+                            Long.valueOf(System.currentTimeMillis() - acceptStartTime)), ste);
+                    continue;
+                } catch (AccessControlException ace) {
+                    log.warn(&quot;StandardServer.accept security exception: &quot;
+                            + ace.getMessage(), ace);
+                    continue;
+                } catch (IOException e) {
+                    if (stopAwait) {
+                        // Wait was aborted with socket.close()
+                        break;
+                    }
+                    log.error(&quot;StandardServer.await: accept: &quot;, e);
+                    break;
+                }
+
+                // Read a set of characters from the socket
+                int expected = 1024; // Cut off to avoid DoS attack
+                while (expected &lt; shutdown.length()) {
+                    if (random == null)
+                        random = new Random();
+                    expected += (random.nextInt() % 1024);
+                }
+                while (expected &gt; 0) {
+                    int ch = -1;
+                    try {
+                        ch = stream.read();
+                    } catch (IOException e) {
+                        log.warn(&quot;StandardServer.await: read: &quot;, e);
+                        ch = -1;
+                    }
+                    if (ch &lt; 32)  // Control character or EOF terminates loop
+                        break;
+                    command.append((char) ch);
+                    expected--;
+                }
+            } finally {
+                // Close the socket now that we are done with it
+                try {
+                    if (socket != null) {
+                        socket.close();
+                    }
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
+
+            // Match against our command string
+
+            boolean match = command.toString().equals(shutdown);
+            if (match) { //如果接收到的命令与SHUTDOWN匹配（由于使用了equals，所以shutdown命令必须是大写的），那么退出循环等待
+                log.info(sm.getString(&quot;standardServer.shutdownViaPort&quot;));
+                break;
+            } else
+                log.warn(&quot;StandardServer.await: Invalid command &apos;&quot;
+                        + command.toString() + &quot;&apos; received&quot;);
+        }
+    } finally {
+        ServerSocket serverSocket = awaitSocket;
+        awaitThread = null;
+        awaitSocket = null;
+
+        // Close the server socket and return
+        if (serverSocket != null) {
+            try {
+                serverSocket.close();
+            } catch (IOException e) {
+                // Ignore
+            }
+        }
+    }
+}
+</code></pre><p>至此，Tomcat启动完毕。</p>
+</li>
+</ul>
+<p>备注：如何启动server，这里不做过多解释，后面会有专门的博客介绍《容器启动过程分析》。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://zhengweishan.oschina.io/2017/03/01/（二）Tomcat_7.0.70启动分析/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://zhengweishan.oschina.io/2017/03/01/（二）Tomcat_7.0.70启动分析/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/03/01/（六）Tomcat_7.0.70生命周期管理/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    (no title)
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/03/01/JMS学习（二）ActiveMQ简单介绍以及安装/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title"></div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2017/03/01/（二）Tomcat_7.0.70启动分析/" data-title="" data-url="http://zhengweishan.oschina.io/2017/03/01/（二）Tomcat_7.0.70启动分析/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习（四）---- Kafka整合SpringMVC实例（二）/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习（四）---- Kafka整合SpringMVC实例（二）/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.035Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习(一) ---- 基本概念以及环境搭建/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习(一) ---- 基本概念以及环境搭建/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.035Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习（三）---- Kafka整合SpringMVC实例/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习（三）---- Kafka整合SpringMVC实例/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.034Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/kafka学习（二）---- Kafka简单的Java版本的HelloWorld实例/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.026Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/03/01/JMS学习（四）Spring和ActiveMQ整合的完整实例/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/03/01/JMS学习（四）Spring和ActiveMQ整合的完整实例/" class="title"></a></p>
+                            <p class="item-date"><time datetime="2017-03-01T08:16:19.025Z" itemprop="datePublished">2017-03-01</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Elasticsearch/">Elasticsearch</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JMS/">JMS</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JVM/">JVM</a><span class="category-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/ActiveMQ/" style="font-size: 10px;">ActiveMQ</a> <a href="/tags/Elasticsearch学习/" style="font-size: 15px;">Elasticsearch学习</a> <a href="/tags/GC/" style="font-size: 15px;">GC</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/JAVA/" style="font-size: 20px;">JAVA</a> <a href="/tags/JMS/" style="font-size: 10px;">JMS</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Reflection/" style="font-size: 10px;">Reflection</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2017 郑伟山 版权所有<br> 
+            由 <a href="http://hexo.io/" target="_blank">Hexo</a> 强力驱动 &brvbar; 主题 -- <a href="https://github.com/ppoffice/hexo-theme-icarus">Icarus</a><br>
+            
+        </div>
+		<div class="inner">
+        	<span id="busuanzi_container_site_pv">
+    			本站总访问量<span id="busuanzi_value_site_pv" class="foot-count"></span>次
+			</span> &brvbar;
+			<span id="busuanzi_container_site_uv">
+  				您是本站第<span id="busuanzi_value_site_uv" class="foot-count"></span>位访客
+			</span>
+		</div>
+    </div>
+</footer>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'wesley-icarus'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
